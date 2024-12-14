@@ -1,0 +1,13 @@
+<label class="label cursor-pointer">
+    <span class="label-text"
+        >{{.Prescription.Medicine}} {{.Prescription.MedicineAmount}}</span
+    >
+    <input
+        type="checkbox"
+        class="toggle toggle-success"
+        {{if
+        .Taken}}
+        checked="checked"
+        {{end}}
+    />
+</label>

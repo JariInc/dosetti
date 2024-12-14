@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+        <style>
+            {{.CSS}}
+        </style>
+        <script>
+            {{.JavaScript}}
+        </script>
+    </head>
+    <body>
+        <div
+            class="grid h-screen place-items-center"
+            hx-trigger="load"
+            hx-get="/partials/body"
+            hx-target="body"
+            hx-swap="innerHTML"
+        >
+            <span class="loading loading-infinity loading-lg"></span>
+        </div>
+    </body>
+</html>

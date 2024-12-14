@@ -1,0 +1,22 @@
+{
+  "name": "dosetti",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "watch:css": "tailwindcss -i ./web/css/tailwind.css -o web/assets/style.css --watch",
+    "build:css": "tailwindcss -i ./web/css/tailwind.css -o web/assets/style.css --minify",
+    "build:js": "esbuild ./web/js/*.js --bundle --outfile=web/assets/bundle.js --minify",
+    "watch:js": "esbuild ./web/js/*.js --bundle --outfile=web/assets/bundle.js --watch",
+    "clean": "find . -name '._*' -delete"
+  },
+  "author": "Jari Ylimäinen",
+  "license": "ISC",
+  "devDependencies": {
+    "daisyui": "^4.12.14",
+    "esbuild": "^0.24.0",
+    "tailwindcss": "^3.4.14"
+  },
+  "dependencies": {
+    "htmx.org": "^2.0.3"
+  }
+}
