@@ -17,6 +17,16 @@ clean:
     # delete odd OS X dot-underscore files from SMB share
     find . -name '._*' -delete
 
+migrate:
+    goose -dir ./internal/database/migrations up
+
+migrate_down:
+    goose -dir ./internal/database/migrations down
+
+seed:
+    # TODO: split db shell to own command for portability
+    turso db shell dosetti-dev < seed.sql
+
 lint_go:
     go fmt github.com/jariinc/...
 

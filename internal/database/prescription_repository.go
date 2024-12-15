@@ -20,14 +20,13 @@ func (repo *PrescriptionRepository) FindById(id int) (data.Prescription, error) 
 	row := repo.Database.Conn.QueryRow("SELECT * FROM prescription WHERE id = ?", id)
 	if err := row.Scan(
 		&prescription.Id,
-		&prescription.Tenant.Id,
+		&prescription.TenantId,
 		&prescription.Interval,
 		&prescription.IntervalUnit,
 		&prescription.StartDate,
 		&prescription.Offset,
 		&prescription.Medicine,
 		&prescription.MedicineAmount,
-		&prescription.MedicineUnit,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return prescription, fmt.Errorf("PrescriptionById %d: no such prescription", id)
@@ -42,14 +41,13 @@ func (repo *PrescriptionRepository) FindByTenant(tenantId int) (data.Prescriptio
 	row := repo.Database.Conn.QueryRow("SELECT * FROM prescription WHERE tenant = ?", tenantId)
 	if err := row.Scan(
 		&prescription.Id,
-		&prescription.Tenant.Id,
+		&prescription.TenantId,
 		&prescription.Interval,
 		&prescription.IntervalUnit,
 		&prescription.StartDate,
 		&prescription.Offset,
 		&prescription.Medicine,
 		&prescription.MedicineAmount,
-		&prescription.MedicineUnit,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return prescription, fmt.Errorf("PrescriptionByTenant %d: no such prescription", tenantId)

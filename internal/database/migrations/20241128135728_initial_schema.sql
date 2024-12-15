@@ -10,24 +10,26 @@ CREATE TABLE prescription (
     start_date TEXT NOT NULL,
     "offset" INTEGER DEFAULT 0,
     medicine TEXT NOT NULL,
-    amount REAL NULL,
-    unit TEXT NULL,
+    amount TEXT NULL,
     FOREIGN KEY (tenant) REFERENCES tenant (id)
 ) RANDOM ROWID;
+
+CREATE INDEX prescription_tenant ON prescription (tenant);
 
 CREATE TABLE serving (
     id INTEGER PRIMARY KEY,
     tenant INTEGER NOT NULL,
     prescription INTEGER NOT NULL,
     medicine TEXT NOT NULL,
-    amount REAL NULL,
-    unit TEXT NULL,
+    amount TEXT NULL,
     taken BOOLEAN DEFAULT FALSE,
     scheduled_at TEXT NOT NULL,
     taken_at TEXT NOT NULL,
     FOREIGN KEY (tenant) REFERENCES tenant (id),
     FOREIGN KEY (prescription) REFERENCES prescription (id)
 ) RANDOM ROWID;
+
+CREATE INDEX serving_tenant ON serving (tenant);
 
 -- +goose StatementEnd
 -- +goose Down

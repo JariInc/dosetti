@@ -1,5 +1,8 @@
 build
 node_modules
-**/._*
 .env
 web/assets/*
+
+# OS X junk
+**/._*
+**/.smbdelete*

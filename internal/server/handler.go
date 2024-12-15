@@ -46,11 +46,11 @@ func RenderBody(tenant_repo *database.TenantRepository) http.Handler {
 				{
 					Prescription: data.Prescription{
 						Id:             123,
-						Tenant:         data.Tenant{Id: 1},
+						TenantId:       1,
 						Interval:       1,
 						IntervalUnit:   data.Daily,
 						Medicine:       "lääke",
-						MedicineAmount: 1,
+						MedicineAmount: "1x 400 mg tbl",
 					},
 					Taken:       false,
 					ScheduledAt: time.Now(),

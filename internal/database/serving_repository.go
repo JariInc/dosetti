@@ -21,14 +21,13 @@ func (repo *ServingRepository) FindByDate(tenantId int, date time.Time) (data.Se
 	row := repo.Database.Conn.QueryRow("SELECT * FROM serving WHERE tenant = ? AND DATE(scheduled_at) = ?", tenantId, date.Format("2006-01-02"))
 	if err := row.Scan(
 		&serving.Id,
-		&serving.Tenant.Id,
+		&serving.TenantId,
 		&serving.Interval,
 		&serving.IntervalUnit,
 		&serving.StartDate,
 		&serving.Offset,
 		&serving.Medicine,
 		&serving.MedicineAmount,
-		&serving.MedicineUnit,
 		&serving.Taken,
 		&serving.TakenAt,
 		&serving.ScheduledAt,

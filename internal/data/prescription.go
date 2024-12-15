@@ -8,26 +8,18 @@ const (
 	Hourly IntervalUnit = iota
 	Daily
 	Weekly
-)
-
-type MedicineUnit string
-
-const (
-	Gram      MedicineUnit = "g"
-	Milligram MedicineUnit = "mg"
-	Microgram MedicineUnit = "ug"
+	Monthly
 )
 
 type Prescription struct {
 	Id             int
-	Tenant         Tenant
+	TenantId       int
 	Interval       int
 	IntervalUnit   IntervalUnit
 	StartDate      time.Time
 	Offset         int
 	Medicine       string
-	MedicineAmount float32
-	MedicineUnit   MedicineUnit
+	MedicineAmount string
 }
 
 func (p Prescription) NewServing(date time.Time) *Serving {
