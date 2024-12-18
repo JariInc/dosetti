@@ -1,14 +1,20 @@
 package data
 
-import "time"
+import (
+	"database/sql/driver"
+	"time"
+)
 
-type IntervalUnit int
+type IntervalUnit string
+
+func (u *IntervalUnit) Scan(value interface{}) error { *u = IntervalUnit(value.(string)); return nil }
+func (u IntervalUnit) Value() (driver.Value, error)  { return string(u), nil }
 
 const (
-	Hourly IntervalUnit = iota
-	Daily
-	Weekly
-	Monthly
+	IntervalHourly  = "hourly"
+	IntervalDaily   = "daily"
+	IntervalWeekly  = "weekly"
+	IntervalMonthly = "monthly"
 )
 
 type Prescription struct {
