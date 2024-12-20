@@ -14,8 +14,9 @@ watch:
 
 clean:
     rm -rf build/*
-    # delete odd OS X dot-underscore files from SMB share
+    # delete odd OS X junk files from SMB share
     find . -name '._*' -delete
+    find . -name '.smbdelete*' -delete
 
 migrate:
     goose -dir ./internal/database/migrations up
@@ -26,6 +27,10 @@ migrate_down:
 seed:
     # TODO: split db shell to own command for portability
     turso db shell dosetti-dev < seed.sql
+
+install_deps:
+    npm install
+    go mod download
 
 lint_go:
     go fmt github.com/jariinc/...
