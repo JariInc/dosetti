@@ -11,8 +11,8 @@ type TenantRepository struct {
 	Database *Database
 }
 
-func NewTenantRepository(db *Database) TenantRepository {
-	return TenantRepository{Database: db}
+func NewTenantRepository(db *Database) *TenantRepository {
+	return &TenantRepository{Database: db}
 }
 
 func (repo *TenantRepository) FindById(id int) (data.Tenant, error) {

@@ -9,10 +9,9 @@ import (
 
 func NewServer(db *database.Database) http.Handler {
 	mux := http.NewServeMux()
-	tenant_repo := database.NewTenantRepository(db)
-	prescription_repo := database.NewPrescriptionRepository(db)
+	repos := database.NewRepositories(db)
 
-	AddRoutes(mux, &tenant_repo, &prescription_repo)
+	AddRoutes(mux, repos)
 
 	loggingMiddleware := httplog.LoggerWithFormatter(httplog.DefaultLogFormatter)
 

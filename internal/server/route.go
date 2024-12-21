@@ -8,8 +8,7 @@ import (
 
 func AddRoutes(
 	mux *http.ServeMux,
-	tenant_repo *database.TenantRepository,
-	prescription_repo *database.PrescriptionRepository) {
+	repos *database.Repositories) {
 	mux.Handle("GET /", RenderFrontpage())
-	mux.Handle("GET /partials/body", RenderBody(tenant_repo))
+	mux.Handle("GET /partials/body", RenderBody(repos))
 }

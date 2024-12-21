@@ -31,9 +31,10 @@ func RenderFrontpage() http.Handler {
 	)
 }
 
-func RenderBody(tenant_repo *database.TenantRepository) http.Handler {
+func RenderBody(repos *database.Repositories) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
+			date := time.Now()
 			tenantId, err := strconv.Atoi(r.URL.Query().Get("t"))
 
 			if err != nil {
@@ -42,20 +43,18 @@ func RenderBody(tenant_repo *database.TenantRepository) http.Handler {
 
 			page := data.NewPage(tenantId, time.Now())
 
-			page.Servings = []data.Serving{
-				{
-					Prescription: data.Prescription{
-						Id:             123,
-						TenantId:       1,
-						Interval:       1,
-						IntervalUnit:   data.Daily,
-						Medicine:       "lääke",
-						MedicineAmount: "1x 400 mg tbl",
-					},
-					Taken:       false,
-					ScheduledAt: time.Now(),
-				},
+			prescriptions, err := repos.PresciptionRepostiory.FindByTenant(tenantId)
+			if err != nil {
+				log.Fatal(err)
 			}
+
+			var servings []*data.Serving
+
+			for _, prescription := range prescriptions {
+				servings = append(servings, prescription.NewServing(date))
+			}
+
+			page.Servings = servings
 
 			err = tmpl.ExecuteTemplate(w, "body.html", page)
 

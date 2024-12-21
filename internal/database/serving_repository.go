@@ -12,8 +12,8 @@ type ServingRepository struct {
 	Database *Database
 }
 
-func NewServingRepository(db *Database) ServingRepository {
-	return ServingRepository{Database: db}
+func NewServingRepository(db *Database) *ServingRepository {
+	return &ServingRepository{Database: db}
 }
 
 func (repo *ServingRepository) FindByDate(tenantId int, date time.Time) (data.Serving, error) {

@@ -6,7 +6,7 @@ import (
 
 type Page struct {
 	TenantId int
-	Servings []Serving
+	Servings []*Serving
 	Date     time.Time
 }
 
@@ -14,7 +14,7 @@ func NewPage(tenantId int, date time.Time) *Page {
 	page := &Page{
 		Date:     date,
 		TenantId: tenantId,
-		Servings: []Serving{},
+		Servings: []*Serving{},
 	}
 
 	return page
