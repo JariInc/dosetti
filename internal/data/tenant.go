@@ -1,6 +1,7 @@
 package data
 
 type Tenant struct {
-	Id  int
-	Key string
+	Id   int
+	Key  string
+	Name string
 }

@@ -11,4 +11,5 @@ func AddRoutes(
 	repos *database.Repositories) {
 	mux.Handle("GET /", RenderFrontpage())
 	mux.Handle("GET /partials/body", RenderBody(repos))
+	mux.Handle("POST /partials/serving", RenderServing(repos))
 }

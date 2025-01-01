@@ -3,8 +3,11 @@ package data
 import "time"
 
 type Serving struct {
-	Prescription
-	Taken       bool
-	TakenAt     time.Time
-	ScheduledAt time.Time
+	Id             int
+	TenantId       int
+	PrescriptionId int
+	Occurrence     int
+	MedicineAmount string
+	Taken          bool
+	TakenAt        time.Time
 }

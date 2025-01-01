@@ -6,6 +6,10 @@ import (
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
+const (
+	DATE_TIME_FORMAT = "2006-01-02 15:04:05.999999999Z07:00"
+)
+
 type Database struct {
 	Conn *sql.DB
 }

@@ -2,10 +2,12 @@ DELETE FROM tenant;
 
 DELETE FROM prescription;
 
+DELETE FROM serving;
+
 INSERT INTO
-    tenant (id, key)
+    tenant (id, key, name)
 VALUES
-    (1, "foobar");
+    (1, "foobar", "FooBar");
 
 INSERT INTO
     prescription (
@@ -13,7 +15,7 @@ INSERT INTO
         tenant,
         interval,
         interval_unit,
-        start_date,
+        start_at,
         medicine,
         amount
     )
@@ -23,30 +25,7 @@ VALUES
         1,
         1,
         "daily",
-        "2024-11-29",
+        "2024-11-29 08:00:00.000000000Z",
         "Panadol",
         "500 mg"
-    );
-
-INSERT INTO
-    serving (
-        id,
-        tenant,
-        prescription,
-        medicine,
-        amount,
-        taken,
-        scheduled_at,
-        taken_at
-    )
-VALUES
-    (
-        1,
-        1,
-        1,
-        "Panadol",
-        "500 mg",
-        TRUE,
-        "2024-11-29T08:00:00",
-        "2024-11-29T08:04:12"
     );

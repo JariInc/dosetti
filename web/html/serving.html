@@ -6,8 +6,8 @@
         type="checkbox"
         class="toggle toggle-success"
         {{if
-        .Taken}}
-        checked="checked"
+        .Taken}}checked="checked"
         {{end}}
+        hx-post="/partials/serving?id={{.Id}}&taken={{if .Taken}}false{{else}}true{{end}}"
     />
 </label>

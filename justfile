@@ -1,9 +1,16 @@
+set dotenv-load
+
+cpus := if os() == "macos" { `sysctl -n hw.ncpu` } else { `nproc` }
+
 build: build_css build_js build_go
 
 run: build
     ./build/dosetti
 
 lint: lint_go
+
+test:
+    go test ./test/... -v -parallel {{cpus}}
 
 watch:
     trap 'kill 0' SIGINT; \
@@ -18,15 +25,19 @@ clean:
     find . -name '._*' -delete
     find . -name '.smbdelete*' -delete
 
-migrate:
+alias migrate := migrate_up
+
+migrate_up:
     goose -dir ./internal/database/migrations up
 
 migrate_down:
     goose -dir ./internal/database/migrations down
 
+db_shell:
+    turso db shell dosetti-dev
+
 seed:
-    # TODO: split db shell to own command for portability
-    turso db shell dosetti-dev < seed.sql
+    just db_shell < seed.sql
 
 install_deps:
     npm install

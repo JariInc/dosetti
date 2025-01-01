@@ -16,16 +16,15 @@ func NewPrescriptionRepository(db *Database) *PrescriptionRepository {
 	return &PrescriptionRepository{Database: db}
 }
 
-func (repo *PrescriptionRepository) FindById(id int) (data.Prescription, error) {
+func (repo *PrescriptionRepository) FindById(tenantId int, id int) (data.Prescription, error) {
 	var prescription data.Prescription
-	row := repo.Database.Conn.QueryRow("SELECT * FROM prescription WHERE id = ?", id)
+	row := repo.Database.Conn.QueryRow("SELECT * FROM prescription WHERE tenant = ? AND id = ?", tenantId, id)
 	if err := row.Scan(
 		&prescription.Id,
 		&prescription.TenantId,
 		&prescription.Interval,
 		&prescription.IntervalUnit,
-		&prescription.StartDate,
-		&prescription.Offset,
+		&prescription.StartAt,
 		&prescription.Medicine,
 		&prescription.MedicineAmount,
 	); err != nil {
@@ -37,13 +36,31 @@ func (repo *PrescriptionRepository) FindById(id int) (data.Prescription, error) 
 	return prescription, nil
 }
 
-func (repo *PrescriptionRepository) FindByTenant(tenantId int) ([]data.Prescription, error) {
+func (repo *PrescriptionRepository) FindBetweenDates(tenantId int, from time.Time, to time.Time) ([]data.Prescription, error) {
 	var err error
 	var prescriptions []data.Prescription
-	rows, err := repo.Database.Conn.Query("SELECT id, tenant, interval, interval_unit, start_date, offset, medicine, amount FROM prescription WHERE tenant = ?", tenantId)
+	rows, err := repo.Database.Conn.Query(`
+		SELECT
+			id,
+		    tenant,
+			interval,
+			interval_unit,
+			start_at,
+			end_at,
+			medicine,
+			amount
+		FROM prescription
+		WHERE
+			tenant = ?
+			AND (
+				(start_at BETWEEN ? AND ?)
+				OR (end_at BETWEEN ? AND ?)
+			 	OR (start_at <= ? AND end_at > ?)
+				OR (start_at <= ? AND end_at IS NULL)
+			)`, tenantId, from, to, from, to, from, to, to)
 
 	if err != nil {
-		return []data.Prescription{}, fmt.Errorf("PrescriptionByTenant %d: %v", tenantId, err)
+		return []data.Prescription{}, fmt.Errorf("PrescriptionBetweenDates %d %s %s: %v", tenantId, from, to, err)
 	}
 
 	defer rows.Close()
@@ -51,29 +68,40 @@ func (repo *PrescriptionRepository) FindByTenant(tenantId int) ([]data.Prescript
 	for rows.Next() {
 		var prescription data.Prescription
 		var start_date_str string
+		var end_date_str sql.NullString
 		if err := rows.Scan(
 			&prescription.Id,
 			&prescription.TenantId,
 			&prescription.Interval,
 			&prescription.IntervalUnit,
 			&start_date_str,
-			&prescription.Offset,
+			&end_date_str,
 			&prescription.Medicine,
 			&prescription.MedicineAmount,
 		); err != nil {
-			return []data.Prescription{}, fmt.Errorf("PrescriptionByTenant %d: %v", tenantId, err)
+			return []data.Prescription{}, fmt.Errorf("PrescriptionBetweenDates %d %s %s: %v", tenantId, from, to, err)
 		}
-		prescription.StartDate, err = time.Parse("2006-01-02", start_date_str)
+		prescription.StartAt, err = time.Parse(DATE_TIME_FORMAT, start_date_str)
+		if err != nil {
+			return []data.Prescription{}, fmt.Errorf("PrescriptionBetweenDates %d %s %s: %v", tenantId, from, to, err)
+		}
+
+		if end_date_str.Valid {
+			prescription.EndAt, err = time.Parse(DATE_TIME_FORMAT, end_date_str.String)
+			if err != nil {
+				return []data.Prescription{}, fmt.Errorf("PrescriptionBetweenDates %d %s %s: %v", tenantId, from, to, err)
+			}
+		}
 
 		prescriptions = append(prescriptions, prescription)
 	}
 
 	if err := rows.Err(); err != nil {
-		return []data.Prescription{}, fmt.Errorf("PrescriptionByTenant %d: %v", tenantId, err)
+		return []data.Prescription{}, fmt.Errorf("PrescriptionBetweenDates %d %s %s: %v", tenantId, from, to, err)
 	}
 
 	if err != nil {
-		return []data.Prescription{}, fmt.Errorf("PrescriptionByTenant %d: %v", tenantId, err)
+		return []data.Prescription{}, fmt.Errorf("PrescriptionBetweenDates %d %s %s: %v", tenantId, from, to, err)
 	}
 
 	return prescriptions, nil

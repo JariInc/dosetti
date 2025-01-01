@@ -1,23 +1,15 @@
-package data
+package page
 
 import (
 	"time"
+
+	"github.com/jariinc/dosetti/internal/data"
 )
 
 type Page struct {
 	TenantId int
-	Servings []*Serving
+	Servings []*data.Serving
 	Date     time.Time
-}
-
-func NewPage(tenantId int, date time.Time) *Page {
-	page := &Page{
-		Date:     date,
-		TenantId: tenantId,
-		Servings: []*Serving{},
-	}
-
-	return page
 }
 
 func (p *Page) NextDayFormatted(format string) string {
