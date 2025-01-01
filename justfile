@@ -1,6 +1,6 @@
 set dotenv-load
 
-cpus := if os() == "macos" { `sysctl -n hw.ncpu` } else { `nproc` }
+cpus := if os() == "macos" { `sysctl -n hw.ncpu` } else { `getconf _NPROCESSORS_ONLN` }
 
 build: build_css build_js build_go
 
