@@ -36,8 +36,11 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	server := server.NewServer(db)
 
 	httpServer := &http.Server{
-		Addr:    net.JoinHostPort("", "8080"),
-		Handler: server,
+		Addr:         net.JoinHostPort("", "8080"),
+		Handler:      server,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  1 * time.Minute,
 	}
 
 	go func() {
