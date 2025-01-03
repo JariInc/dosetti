@@ -99,8 +99,6 @@ func (repo *ServingRepository) FindByOccurrences(tenantId int, prescriptionId in
 			return []*data.Serving{}, err
 		}
 
-		fmt.Println("serving", serving.Id, "taken", serving.Taken)
-
 		if taken_at_str.Valid {
 			serving.TakenAt, err = time.Parse(DATE_TIME_FORMAT, taken_at_str.String)
 			if err != nil {
@@ -123,8 +121,6 @@ func (repo *ServingRepository) Save(serving *data.Serving) error {
 			Valid:  true,
 		}
 	}
-
-	fmt.Println("saving serving", serving)
 
 	result, err := repo.Database.Conn.Exec(`
 		REPLACE INTO serving

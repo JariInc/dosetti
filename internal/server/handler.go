@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -98,8 +97,6 @@ func RenderServing(repos *database.Repositories) http.Handler {
 			default:
 				http.Error(w, "Invalid taken value", http.StatusBadRequest)
 			}
-
-			fmt.Println("taken", taken)
 
 			serving, err := repos.ServingRepository.FindByOccurrence(1, prescriptionId, occurrence)
 			if err != nil {

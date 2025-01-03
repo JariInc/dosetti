@@ -1,7 +1,6 @@
 package page
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -21,7 +20,6 @@ func NewPage(repos *database.Repositories, tenantId int, date time.Time) *Page {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("NewPage found", len(prescriptions), "prescriptions")
 
 	for _, prescription := range prescriptions {
 		occurrances := prescription.OccurrancesBetweenDates(from, to)
@@ -32,12 +30,9 @@ func NewPage(repos *database.Repositories, tenantId int, date time.Time) *Page {
 		}
 
 		for _, occurrance := range occurrances {
-			fmt.Println("occurrance", occurrance)
 			found := false
 			for _, serving := range servings {
-				fmt.Println("serving", serving)
 				if serving.Occurrence == occurrance {
-					fmt.Println("serving.Occurrence == occurrance")
 					page.Servings = append(page.Servings, serving)
 					found = true
 				}
@@ -48,8 +43,6 @@ func NewPage(repos *database.Repositories, tenantId int, date time.Time) *Page {
 
 			}
 		}
-
-		fmt.Println(len(servings))
 	}
 
 	return page
