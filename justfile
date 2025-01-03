@@ -34,12 +34,12 @@ migrate_down:
     goose -dir ./internal/database/migrations down
 
 db_shell:
-    turso db shell dosetti-dev
+    sqlite3 dosetti.db
 
 seed:
     just db_shell < seed.sql
 
-install_deps:
+install:
     npm install
     go mod download
 

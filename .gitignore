@@ -2,6 +2,7 @@ build
 node_modules
 .env
 web/assets/*
+/*.db
 
 # OS X junk
 **/._*

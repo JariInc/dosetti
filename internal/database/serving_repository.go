@@ -125,8 +125,7 @@ func (repo *ServingRepository) Save(serving *data.Serving) error {
 	result, err := repo.Database.Conn.Exec(`
 		REPLACE INTO serving
 			(tenant, prescription, occurrence, amount, taken, taken_at)
-			VALUES (?, ?, ?, ?, ?, ?)
-			RETURNING id`,
+			VALUES (?, ?, ?, ?, ?, ?)`,
 		serving.TenantId,
 		serving.PrescriptionId,
 		serving.Occurrence,

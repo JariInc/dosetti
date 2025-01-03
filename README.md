@@ -1,20 +1,19 @@
 # Dosetti
 
-Medicine tracking app.
+Dosetti is a progressive web application for tracking medicine intake.
 
-## Quick start guide
+## Installing self-hosted version
 
+### TODO
 
+## Development
 
-## Goose
-
-```shell
-setopt allexport ; . ./.env ; unsetopt allexport
-goose -dir ./internal/database/migrations up
 ```
-
-## Seed
-
-```shell
-turso db shell dosetti-dev < seed.sql
+cp .env.local .env
+just install
+just migrate
+just seed
+just run
+# or
+just watch
 ```

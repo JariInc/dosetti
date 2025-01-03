@@ -3,11 +3,11 @@ package database
 import (
 	"database/sql"
 
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	_ "github.com/tursodatabase/go-libsql"
 )
 
 const (
-	DATE_TIME_FORMAT = "2006-01-02 15:04:05.999999999Z07:00"
+	DATE_TIME_FORMAT = "2006-01-02T15:04:05.999999999Z07:00"
 )
 
 type Database struct {
