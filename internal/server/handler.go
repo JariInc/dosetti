@@ -1,6 +1,9 @@
 package server
 
 import (
+	"database/sql"
+	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -67,16 +70,61 @@ func RenderBody(repos *database.Repositories) http.Handler {
 func RenderServing(repos *database.Repositories) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			servingId, err := strconv.Atoi(r.URL.Query().Get("id"))
-
+			tenantId, err := strconv.Atoi(r.URL.Query().Get("tenant"))
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Error(w, "Unable to parse tenant", http.StatusBadRequest)
+				return
 			}
 
-			serving, err := repos.ServingRepository.FindById(1, servingId)
+			prescriptionId, err := strconv.Atoi(r.URL.Query().Get("prescription"))
+			if err != nil {
+				http.Error(w, "Unable to parse prescription", http.StatusBadRequest)
+				return
+			}
+
+			occurrence, err := strconv.Atoi(r.URL.Query().Get("occurrence"))
+			if err != nil {
+				http.Error(w, "Unable to parse occurrence", http.StatusBadRequest)
+				return
+			}
+
+			var taken bool
+
+			switch r.URL.Query().Get("taken") {
+			case "true":
+				taken = true
+			case "false":
+				taken = false
+			default:
+				http.Error(w, "Invalid taken value", http.StatusBadRequest)
+			}
+
+			fmt.Println("taken", taken)
+
+			serving, err := repos.ServingRepository.FindByOccurrence(1, prescriptionId, occurrence)
+			if err != nil {
+				if !errors.Is(err, sql.ErrNoRows) {
+					http.Error(w, err.Error(), http.StatusNotFound)
+					return
+				} else {
+					prescription, err := repos.PresciptionRepostiory.FindById(tenantId, prescriptionId)
+					if err != nil {
+						http.Error(w, err.Error(), http.StatusNotFound)
+						return
+					}
+
+					serving = prescription.NewServing(occurrence)
+				}
+			}
+
+			serving.Taken = taken
+			serving.TakenAt = time.Now()
+
+			err = repos.ServingRepository.Save(serving)
 
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 
 			err = tmpl.ExecuteTemplate(w, "serving.html", serving)

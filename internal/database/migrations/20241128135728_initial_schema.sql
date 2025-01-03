@@ -34,7 +34,7 @@ CREATE TABLE serving (
     FOREIGN KEY (prescription) REFERENCES prescription (id)
 );
 
-CREATE INDEX serving_tenant ON serving (tenant);
+CREATE UNIQUE INDEX serving_occurrence ON serving (tenant, prescription, occurrence);
 
 -- +goose StatementEnd
 -- +goose Down

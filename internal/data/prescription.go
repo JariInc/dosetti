@@ -42,20 +42,20 @@ func (p *Prescription) NewServing(occurrence int) *Serving {
 func (p *Prescription) OccurrancesBetweenDates(from time.Time, to time.Time) []int {
 	hours_to_from := from.Sub(p.StartAt).Hours()   // inclusive start
 	hours_to_to := (to.Sub(p.StartAt) - 1).Hours() // exclusive end
-	var occurrance_from int
-	var occurrance_to int
-	var occurances []int
+	var occurrence_from int
+	var occurrence_to int
+	var occurences []int
 
 	switch p.IntervalUnit {
 	case IntervalHourly:
-		occurrance_from = int(math.Ceil(hours_to_from / float64(p.Interval)))
-		occurrance_to = int(math.Floor(hours_to_to / float64(p.Interval)))
+		occurrence_from = int(math.Ceil(hours_to_from / float64(p.Interval)))
+		occurrence_to = int(math.Floor(hours_to_to / float64(p.Interval)))
 	case IntervalDaily:
-		occurrance_from = int(math.Ceil(hours_to_from / (float64(p.Interval) * 24)))
-		occurrance_to = int(math.Floor(hours_to_to / (float64(p.Interval) * 24)))
+		occurrence_from = int(math.Ceil(hours_to_from / (float64(p.Interval) * 24)))
+		occurrence_to = int(math.Floor(hours_to_to / (float64(p.Interval) * 24)))
 	case IntervalWeekly:
-		occurrance_from = int(math.Ceil(hours_to_from / (float64(p.Interval) * 24 * 7)))
-		occurrance_to = int(math.Floor(hours_to_to / (float64(p.Interval) * 24 * 7)))
+		occurrence_from = int(math.Ceil(hours_to_from / (float64(p.Interval) * 24 * 7)))
+		occurrence_to = int(math.Floor(hours_to_to / (float64(p.Interval) * 24 * 7)))
 	case IntervalMonthly:
 		//nextMonth := iter.AddDate(0, 1, 0)
 		//interval = nextMonth.Sub(iter)
@@ -64,9 +64,9 @@ func (p *Prescription) OccurrancesBetweenDates(from time.Time, to time.Time) []i
 		panic("unknown interval unit")
 	}
 
-	for i := occurrance_from; i <= occurrance_to; i++ {
-		occurances = append(occurances, i)
+	for i := occurrence_from; i <= occurrence_to; i++ {
+		occurences = append(occurences, i)
 	}
 
-	return occurances
+	return occurences
 }
