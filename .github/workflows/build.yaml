@@ -37,6 +37,9 @@ jobs:
 
   Build-Go:
     name: Build Go
+    needs:
+      - Build-JavaScript
+      - Build-CSS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
