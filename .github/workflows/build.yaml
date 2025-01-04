@@ -3,6 +3,38 @@ run-name: Build application
 on: [push]
 
 jobs:
+  Build-JavaScript:
+    name: Build JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install
+        run: npm install
+      - name: Build
+        run: npx esbuild ./web/js/*.js --bundle --outfile=web/assets/bundle.js --minify
+      - name: Archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: javascript bundle
+          path: web/assets/bundle.js
+
+  Build-CSS:
+    name: Build CSS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install
+        run: npm install
+      - name: Build
+        run: npx tailwindcss -i ./web/css/tailwind.css -o web/assets/style.css --minify
+      - name: Archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: css bundle
+          path: web/assets/style.css
+
   Build-Go:
     name: Build Go
     runs-on: ubuntu-latest
@@ -13,10 +45,18 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: 1.23
+      - name: Download CSS
+        uses: actions/download-artifact@v4
+        with:
+          name: css bundle
+      - name: Download JavaScript
+        uses: actions/download-artifact@v4
+        with:
+          name: javascript bundle
       - name: Build
         run: go build -o ./build/dosetti cmd/dosetti/main.go
       - name: Archive
         uses: actions/upload-artifact@v4
         with:
-          name: build
+          name: application
           path: ./build/dosetti
