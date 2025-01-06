@@ -1,11 +1,16 @@
-name: Build
-run-name: Build application
+name: CI/CD
 on: [push]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  Build-JavaScript:
+  build-js:
     name: Build JavaScript
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,9 +24,11 @@ jobs:
           name: javascript bundle
           path: web/assets/bundle.js
 
-  Build-CSS:
+  build-css:
     name: Build CSS
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,12 +42,14 @@ jobs:
           name: css bundle
           path: web/assets/style.css
 
-  Build-Go:
+  build-go:
     name: Build Go
     needs:
-      - Build-JavaScript
-      - Build-CSS
+      - build-js
+      - build-css
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,3 +76,43 @@ jobs:
           path: |
             ./build/dosetti
             ./web/html
+
+  build-docker:
+    name: Build Docker image
+    # TODO: tests
+    # needs:
+    #   - unit-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

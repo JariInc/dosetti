@@ -23,7 +23,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 
 	err := godotenv.Load()
 	if err != nil {
-		return err
+		fmt.Println(err.Error())
 	}
 
 	db, err := database.NewDatabase(os.Getenv("DATABASE_URL"))
