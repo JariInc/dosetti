@@ -13,7 +13,7 @@ import (
 	assets "github.com/jariinc/dosetti/web"
 )
 
-var tmpl = template.Must(template.ParseGlob("./web/html/*.html"))
+var tmpl, _ = template.ParseGlob("web/html/*.html")
 
 func RenderFrontpage() http.Handler {
 	return http.HandlerFunc(
