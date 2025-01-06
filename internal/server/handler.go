@@ -44,22 +44,7 @@ func RenderBody(repos *database.Repositories) http.Handler {
 
 			page := page.NewPage(repos, tenantId, time.Now())
 
-			// prescriptions, err := repos.PresciptionRepostiory.FindByTenant(tenantId)
-			// if err != nil {
-			// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-			// }
-
-			// var servings []*data.Serving
-
-			// for _, prescription := range prescriptions {
-			// 	servings = append(servings, prescription.NewServing(date))
-			// }
-
-			// page.Servings = servings
-
-			err = tmpl.ExecuteTemplate(w, "body.html", page)
-
-			if err != nil {
+			if err = tmpl.ExecuteTemplate(w, "body.html", page); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		},
