@@ -22,6 +22,7 @@ func SessionMiddleware(tenant_repo *database.TenantRepository) func(next http.Ha
 				switch {
 				case errors.Is(err, http.ErrNoCookie):
 					session = NewSession()
+					tenant_repo.Save(session.Tenant)
 				default:
 					log.Println(err)
 					http.Error(w, "cookie error", http.StatusInternalServerError)
