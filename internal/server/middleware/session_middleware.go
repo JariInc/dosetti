@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jariinc/dosetti/internal/database"
+	"github.com/jariinc/dosetti/internal/database/database_interface"
 )
 
 const TENANT_COOKIE = "tenant"
 
-func SessionMiddleware(tenant_repo *database.TenantRepository) func(next http.Handler) http.Handler {
+func SessionMiddleware(tenant_repo database_interface.TenantRepository) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var session *Session

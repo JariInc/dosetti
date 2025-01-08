@@ -1,4 +1,4 @@
-package database
+package libsql
 
 import (
 	"database/sql"
@@ -10,22 +10,22 @@ const (
 	DATE_TIME_FORMAT = "2006-01-02T15:04:05.999999999Z07:00"
 )
 
-type Database struct {
+type Connection struct {
 	Conn *sql.DB
 }
 
-func (db *Database) Close() {
+func (db *Connection) Close() {
 	db.Conn.Close()
 }
 
-func NewDatabase(connectionURL string) (*Database, error) {
+func NewConnection(connectionURL string) (*Connection, error) {
 	conn, err := sql.Open("libsql", connectionURL)
 
 	if err != nil {
 		return nil, err
 	}
 
-	db := &Database{
+	db := &Connection{
 		Conn: conn,
 	}
 

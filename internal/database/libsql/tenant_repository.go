@@ -1,21 +1,22 @@
-package database
+package libsql
 
 import (
 	"database/sql"
 	"fmt"
 
 	"github.com/jariinc/dosetti/internal/data"
+	"github.com/jariinc/dosetti/internal/database/database_interface"
 )
 
-type TenantRepository struct {
-	Database *Database
+type LibSQLTenantRepository struct {
+	Database *Connection
 }
 
-func NewTenantRepository(db *Database) *TenantRepository {
-	return &TenantRepository{Database: db}
+func NewLibSQLTenantRepository(db *Connection) database_interface.TenantRepository {
+	return &LibSQLTenantRepository{Database: db}
 }
 
-func (repo *TenantRepository) FindById(id int) (data.Tenant, error) {
+func (repo *LibSQLTenantRepository) FindById(id int) (data.Tenant, error) {
 	var tenant data.Tenant
 	row := repo.Database.Conn.QueryRow("SELECT * FROM tenant WHERE id = ?", id)
 	if err := row.Scan(&tenant.Id, &tenant.UUID); err != nil {
@@ -27,7 +28,7 @@ func (repo *TenantRepository) FindById(id int) (data.Tenant, error) {
 	return tenant, nil
 }
 
-func (repo *TenantRepository) FindByUUID(uuid string) (data.Tenant, error) {
+func (repo *LibSQLTenantRepository) FindByUUID(uuid string) (data.Tenant, error) {
 	var tenant data.Tenant
 	row := repo.Database.Conn.QueryRow("SELECT * FROM tenant WHERE uuid = ?", uuid)
 	if err := row.Scan(&tenant.Id, &tenant.UUID); err != nil {
@@ -39,7 +40,7 @@ func (repo *TenantRepository) FindByUUID(uuid string) (data.Tenant, error) {
 	return tenant, nil
 }
 
-func (repo *TenantRepository) Save(tenant *data.Tenant) error {
+func (repo *LibSQLTenantRepository) Save(tenant *data.Tenant) error {
 	result, err := repo.Database.Conn.Exec(`
 		REPLACE INTO tenant
 			(uuid)

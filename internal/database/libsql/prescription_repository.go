@@ -1,4 +1,4 @@
-package database
+package libsql
 
 import (
 	"database/sql"
@@ -6,17 +6,18 @@ import (
 	"time"
 
 	"github.com/jariinc/dosetti/internal/data"
+	"github.com/jariinc/dosetti/internal/database/database_interface"
 )
 
-type PrescriptionRepository struct {
-	Database *Database
+type LibSQLPrescriptionRepository struct {
+	Database *Connection
 }
 
-func NewPrescriptionRepository(db *Database) *PrescriptionRepository {
-	return &PrescriptionRepository{Database: db}
+func NewLibSQLPrescriptionRepository(db *Connection) database_interface.PrescriptionRepository {
+	return &LibSQLPrescriptionRepository{Database: db}
 }
 
-func (repo *PrescriptionRepository) FindById(tenantId int, id int) (*data.Prescription, error) {
+func (repo *LibSQLPrescriptionRepository) FindById(tenantId int, id int) (*data.Prescription, error) {
 	var prescription data.Prescription
 	var start_date_str string
 	var end_date_str sql.NullString
@@ -55,7 +56,7 @@ func (repo *PrescriptionRepository) FindById(tenantId int, id int) (*data.Prescr
 	return &prescription, nil
 }
 
-func (repo *PrescriptionRepository) FindBetweenDates(tenantId int, from time.Time, to time.Time) ([]data.Prescription, error) {
+func (repo *LibSQLPrescriptionRepository) FindBetweenDates(tenantId int, from time.Time, to time.Time) ([]data.Prescription, error) {
 	var err error
 	var prescriptions []data.Prescription
 	rows, err := repo.Database.Conn.Query(`
