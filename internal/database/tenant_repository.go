@@ -18,7 +18,7 @@ func NewTenantRepository(db *Database) *TenantRepository {
 func (repo *TenantRepository) FindById(id int) (data.Tenant, error) {
 	var tenant data.Tenant
 	row := repo.Database.Conn.QueryRow("SELECT * FROM tenant WHERE id = ?", id)
-	if err := row.Scan(&tenant.Id, &tenant.Key); err != nil {
+	if err := row.Scan(&tenant.Id, &tenant.UUID); err != nil {
 		if err == sql.ErrNoRows {
 			return tenant, fmt.Errorf("TenantById %d: no such tenant", id)
 		}
@@ -27,14 +27,35 @@ func (repo *TenantRepository) FindById(id int) (data.Tenant, error) {
 	return tenant, nil
 }
 
-func (repo *TenantRepository) FindByKey(key string) (data.Tenant, error) {
+func (repo *TenantRepository) FindByUUID(uuid string) (data.Tenant, error) {
 	var tenant data.Tenant
-	row := repo.Database.Conn.QueryRow("SELECT * FROM tenant WHERE key = ?", key)
-	if err := row.Scan(&tenant.Id, &tenant.Key); err != nil {
+	row := repo.Database.Conn.QueryRow("SELECT * FROM tenant WHERE uuid = ?", uuid)
+	if err := row.Scan(&tenant.Id, &tenant.UUID); err != nil {
 		if err == sql.ErrNoRows {
-			return tenant, fmt.Errorf("TenantByKey %s: no such tenant", key)
+			return tenant, fmt.Errorf("TenantByUUID %s: no such tenant", uuid)
 		}
-		return tenant, fmt.Errorf("TenantByKey %s: %v", key, err)
+		return tenant, fmt.Errorf("TenantByUUID %s: %v", uuid, err)
 	}
 	return tenant, nil
+}
+
+func (repo *TenantRepository) Save(tenant *data.Tenant) error {
+	result, err := repo.Database.Conn.Exec(`
+		REPLACE INTO tenant
+			(uuid)
+			VALUES (?)`,
+		tenant.UUID,
+	)
+
+	if err != nil {
+		return fmt.Errorf("Save serving: %v", err)
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return fmt.Errorf("Save serving: %v", err)
+	}
+	tenant.Id = int(id)
+
+	return nil
 }

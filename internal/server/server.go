@@ -16,7 +16,7 @@ func NewServer(db *database.Database) http.Handler {
 	AddRoutes(mux, repos)
 
 	loggingMiddleware := httplog.LoggerWithFormatter(httplog.DefaultLogFormatter)
-	sessionMiddleware := middleware.SessionMiddleware
+	sessionMiddleware := middleware.SessionMiddleware(repos.TenantRepository)
 
 	var handler http.Handler = mux
 	handler = loggingMiddleware(handler)

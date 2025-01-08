@@ -5,20 +5,24 @@ import (
 	"math/big"
 
 	"github.com/google/uuid"
+	"github.com/jariinc/dosetti/internal/data"
 )
 
 type Session struct {
-	TenantId int
-	UUID     uuid.UUID
+	Tenant *data.Tenant
+	UUID   uuid.UUID
 }
 
 func NewSession() *Session {
-	s := Session{}
-	var err error
-	s.UUID, err = uuid.NewRandom()
+	tenant_uuid, err := uuid.NewRandom()
 
 	if err != nil {
 		panic("cannot create uuid")
+	}
+
+	s := Session{
+		Tenant: data.NewTenant(tenant_uuid.String()),
+		UUID:   tenant_uuid,
 	}
 
 	return &s
@@ -26,8 +30,8 @@ func NewSession() *Session {
 
 func LoadSession(base62_uuid string) (*Session, error) {
 	var i big.Int
-	_, ok := i.SetString(base62_uuid, 62)
-	if !ok {
+	_, err := i.SetString(base62_uuid, 62)
+	if !err {
 		return &Session{}, fmt.Errorf("cannot parse base62: %q", base62_uuid)
 	}
 
