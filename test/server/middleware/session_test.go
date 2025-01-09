@@ -13,8 +13,8 @@ func TestNewSession(t *testing.T) {
 }
 
 func TestLoadSession(t *testing.T) {
-	base62 := "7GYVBwj8jeuPNvO87zBA58"
-	s := middleware.Session{Key: base62}
+	key := "7GYVBwj8jeuPNvO87zBA58"
+	s := middleware.Session{Key: key}
 
-	assert.Equal(t, s.Key, base62)
+	assert.Equal(t, s.Key, key)
 }
