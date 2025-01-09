@@ -1,12 +1,12 @@
 package data
 
 type Tenant struct {
-	Id   int
-	UUID string
+	Id  int
+	Key string
 }
 
-func NewTenant(uuid string) *Tenant {
+func NewTenant(key string) *Tenant {
 	return &Tenant{
-		UUID: uuid,
+		Key: key,
 	}
 }

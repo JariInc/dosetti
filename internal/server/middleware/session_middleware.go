@@ -29,15 +29,9 @@ func SessionMiddleware(tenant_repo database_interface.TenantRepository) func(nex
 					return
 				}
 			} else {
-				session, err = LoadSession(cookie.Value)
+				session = &Session{Key: cookie.Value}
 
-				if err != nil {
-					log.Println(err)
-					http.Error(w, "session loading error", http.StatusInternalServerError)
-					return
-				}
-
-				tenant, err := tenant_repo.FindByUUID(session.UUID.String())
+				tenant, err := tenant_repo.FindByKey(session.Key)
 				if err != nil {
 					session = NewSession()
 					tenant_repo.Save(session.Tenant)
@@ -51,7 +45,7 @@ func SessionMiddleware(tenant_repo database_interface.TenantRepository) func(nex
 
 			newCookie := http.Cookie{
 				Name:     TENANT_COOKIE,
-				Value:    session.Base62UUID(),
+				Value:    session.Key,
 				Path:     "/",
 				Expires:  time.Now().Add(time.Hour * 24 * 365),
 				HttpOnly: true,

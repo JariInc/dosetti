@@ -19,7 +19,7 @@ func NewLibSQLTenantRepository(db *Connection) database_interface.TenantReposito
 func (repo *LibSQLTenantRepository) FindById(id int) (data.Tenant, error) {
 	var tenant data.Tenant
 	row := repo.Database.Conn.QueryRow("SELECT * FROM tenant WHERE id = ?", id)
-	if err := row.Scan(&tenant.Id, &tenant.UUID); err != nil {
+	if err := row.Scan(&tenant.Id, &tenant.Key); err != nil {
 		if err == sql.ErrNoRows {
 			return tenant, fmt.Errorf("TenantById %d: no such tenant", id)
 		}
@@ -28,14 +28,14 @@ func (repo *LibSQLTenantRepository) FindById(id int) (data.Tenant, error) {
 	return tenant, nil
 }
 
-func (repo *LibSQLTenantRepository) FindByUUID(uuid string) (data.Tenant, error) {
+func (repo *LibSQLTenantRepository) FindByKey(uuid string) (data.Tenant, error) {
 	var tenant data.Tenant
-	row := repo.Database.Conn.QueryRow("SELECT * FROM tenant WHERE uuid = ?", uuid)
-	if err := row.Scan(&tenant.Id, &tenant.UUID); err != nil {
+	row := repo.Database.Conn.QueryRow("SELECT * FROM tenant WHERE key = ?", uuid)
+	if err := row.Scan(&tenant.Id, &tenant.Key); err != nil {
 		if err == sql.ErrNoRows {
-			return tenant, fmt.Errorf("TenantByUUID %s: no such tenant", uuid)
+			return tenant, fmt.Errorf("TenantByKey %s: no such tenant", uuid)
 		}
-		return tenant, fmt.Errorf("TenantByUUID %s: %v", uuid, err)
+		return tenant, fmt.Errorf("TenantByKey %s: %v", uuid, err)
 	}
 	return tenant, nil
 }
@@ -43,9 +43,9 @@ func (repo *LibSQLTenantRepository) FindByUUID(uuid string) (data.Tenant, error)
 func (repo *LibSQLTenantRepository) Save(tenant *data.Tenant) error {
 	result, err := repo.Database.Conn.Exec(`
 		REPLACE INTO tenant
-			(uuid)
+			(key)
 			VALUES (?)`,
-		tenant.UUID,
+		tenant.Key,
 	)
 
 	if err != nil {

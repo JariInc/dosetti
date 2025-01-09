@@ -1,52 +1,34 @@
 package middleware
 
 import (
-	"fmt"
+	"crypto/rand"
 	"math/big"
 
-	"github.com/google/uuid"
 	"github.com/jariinc/dosetti/internal/data"
 )
 
 type Session struct {
 	Tenant *data.Tenant
-	UUID   uuid.UUID
+	Key    string
 }
 
 func NewSession() *Session {
-	tenant_uuid, err := uuid.NewRandom()
-
-	if err != nil {
-		panic("cannot create uuid")
-	}
+	key := createNewKey()
 
 	s := Session{
-		Tenant: data.NewTenant(tenant_uuid.String()),
-		UUID:   tenant_uuid,
+		Tenant: data.NewTenant(key),
+		Key:    key,
 	}
 
 	return &s
 }
 
-func LoadSession(base62_uuid string) (*Session, error) {
+func createNewKey() string {
 	var i big.Int
-	_, err := i.SetString(base62_uuid, 62)
-	if !err {
-		return &Session{}, fmt.Errorf("cannot parse base62: %q", base62_uuid)
-	}
+	key_bytes := make([]byte, 16)
 
-	var uuid uuid.UUID
-	copy(uuid[:], i.Bytes())
+	rand.Read(key_bytes)
+	i.SetBytes(key_bytes[:])
 
-	s := Session{
-		UUID: uuid,
-	}
-
-	return &s, nil
-}
-
-func (s *Session) Base62UUID() string {
-	var i big.Int
-	i.SetBytes(s.UUID[:])
 	return i.Text(62)
 }
