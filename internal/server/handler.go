@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -10,12 +11,24 @@ import (
 
 	"github.com/jariinc/dosetti/internal/database"
 	"github.com/jariinc/dosetti/internal/page"
+	"github.com/jariinc/dosetti/internal/server/middleware"
 	assets "github.com/jariinc/dosetti/web"
 )
 
 var tmpl, _ = template.ParseGlob("web/html/*.html")
 
-func RenderFrontpage() http.Handler {
+func RedirectToDayView() http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			session := ctx.Value("session").(*middleware.Session)
+			url := fmt.Sprintf("/%s/", session.Key)
+			http.Redirect(w, r, url, http.StatusSeeOther)
+		},
+	)
+}
+
+func RenderDayView() http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			err := tmpl.ExecuteTemplate(w, "index.html", struct {
@@ -27,6 +40,7 @@ func RenderFrontpage() http.Handler {
 			})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 		},
 	)
