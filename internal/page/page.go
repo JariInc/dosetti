@@ -7,22 +7,10 @@ import (
 )
 
 type Page struct {
-	TenantId int
-	Servings []*data.Serving
-	Date     time.Time
-}
-
-func (p *Page) NextDayFormatted(format string) string {
-	next := p.Date.Add(time.Hour * 24)
-	return next.Format(format)
-}
-
-func (p *Page) PreviousDayFormatted(format string) string {
-	next := p.Date.Add(time.Hour * -24)
-	return next.Format(format)
-}
-
-func (p *Page) TodayFormatted(format string) string {
-	today := time.Now()
-	return today.Format(format)
+	TenantId    int
+	Servings    []*data.Serving
+	CurrentDay  time.Time
+	NextDay     time.Time
+	PreviousDay time.Time
+	SessionKey  string
 }

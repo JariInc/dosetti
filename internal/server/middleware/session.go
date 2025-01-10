@@ -12,15 +12,15 @@ type Session struct {
 	Key    string
 }
 
-func NewSession() *Session {
+func NewSession() Session {
 	key := createNewKey()
 
-	s := Session{
+	session := Session{
 		Tenant: data.NewTenant(key),
 		Key:    key,
 	}
 
-	return &s
+	return session
 }
 
 func createNewKey() string {

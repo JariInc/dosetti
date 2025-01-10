@@ -15,7 +15,7 @@ const TENANT_COOKIE = "tenant"
 func SessionMiddleware(tenant_repo database_interface.TenantRepository) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			var session *Session
+			var session Session
 			cookie, err := r.Cookie(TENANT_COOKIE)
 
 			if err != nil {
@@ -29,7 +29,7 @@ func SessionMiddleware(tenant_repo database_interface.TenantRepository) func(nex
 					return
 				}
 			} else {
-				session = &Session{Key: cookie.Value}
+				session = Session{Key: cookie.Value}
 
 				tenant, err := tenant_repo.FindByKey(session.Key)
 				if err != nil {

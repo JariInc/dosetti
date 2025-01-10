@@ -13,7 +13,7 @@
         <div
             class="grid h-screen place-items-center"
             hx-trigger="load"
-            hx-get="/{{ .SessionKey }}/day/{{ .Date }}/{$}"
+            hx-get="/{{ .SessionKey }}/{{ .CurrentDay.Format "2006-01-02" }}/servings/"
             hx-target="body"
             hx-swap="innerHTML"
         >
