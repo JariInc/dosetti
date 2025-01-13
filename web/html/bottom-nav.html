@@ -1,6 +1,6 @@
 <div class="btm-nav">
     <button
-        hx-get="/{{ .SessionKey }}/day/{{ .PreviousDay.Format "2006-01-02" }}/"
+        hx-get="/{{ .SessionKey }}/{{ .PreviousDay.Format "2006-01-02" }}/servings/"
         hx-target="body"
         hx-swap="innerHTML"
     >
@@ -23,7 +23,7 @@
         >
     </button>
     <button
-        hx-get="/partials/body?date={{ .CurrentDay.Format "2006-01-02" }}/"
+        hx-get="/{{ .SessionKey }}/{{ .Today.Format "2006-01-02" }}/servings/"
         hx-target="body"
         hx-swap="innerHTML"
     >
@@ -44,7 +44,7 @@
         <span class="btm-nav-label">Today</span>
     </button>
     <button
-        hx-get="/{{ .SessionKey }}/day/{{ .NextDay.Format "2006-01-02" }}/"
+        hx-get="/{{ .SessionKey }}/{{ .NextDay.Format "2006-01-02" }}/servings/"
         hx-target="body"
         hx-swap="innerHTML"
     >

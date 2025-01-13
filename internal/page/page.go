@@ -9,6 +9,7 @@ import (
 type Page struct {
 	TenantId    int
 	Servings    []*data.Serving
+	Today       time.Time
 	CurrentDay  time.Time
 	NextDay     time.Time
 	PreviousDay time.Time

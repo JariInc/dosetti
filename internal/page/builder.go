@@ -10,6 +10,7 @@ import (
 
 func NewPage(repos *database.Repositories, session middleware.Session, date time.Time) *Page {
 	page := &Page{
+		Today:       time.Now(),
 		CurrentDay:  date,
 		NextDay:     date.AddDate(0, 0, 1),
 		PreviousDay: date.AddDate(0, 0, -1),
