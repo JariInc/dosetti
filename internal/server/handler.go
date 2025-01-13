@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -10,23 +11,50 @@ import (
 
 	"github.com/jariinc/dosetti/internal/database"
 	"github.com/jariinc/dosetti/internal/page"
+	"github.com/jariinc/dosetti/internal/server/middleware"
 	assets "github.com/jariinc/dosetti/web"
 )
 
-var tmpl = template.Must(template.ParseGlob("./web/html/*.html"))
+var tmpl, _ = template.ParseGlob("web/html/*.html")
 
-func RenderFrontpage() http.Handler {
+func RedirectToDayView() http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			err := tmpl.ExecuteTemplate(w, "index.html", struct {
+			ctx := r.Context()
+			session := ctx.Value("session").(middleware.Session)
+			current_day := time.Now()
+			url := fmt.Sprintf("/%s/%s/", session.Key, current_day.Format("2006-01-02"))
+			http.Redirect(w, r, url, http.StatusSeeOther)
+		},
+	)
+}
+
+func RenderDayView() http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			session := r.Context().Value("session").(middleware.Session)
+			date, err := time.Parse("2006-01-02", r.PathValue("date"))
+
+			if err != nil {
+				date = time.Now()
+			}
+
+			err = tmpl.ExecuteTemplate(w, "index.html", struct {
 				CSS        template.CSS
 				JavaScript template.JS
+				SessionKey string
+				CurrentDay time.Time
 			}{
 				CSS:        template.CSS(assets.CSS),
 				JavaScript: template.JS(assets.JavaScript),
+				SessionKey: session.Key,
+				CurrentDay: date,
 			})
+
 			if err != nil {
+				fmt.Println(err.Error())
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 		},
 	)
@@ -35,32 +63,19 @@ func RenderFrontpage() http.Handler {
 func RenderBody(repos *database.Repositories) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			//date := time.Now()
-			tenantId, err := strconv.Atoi(r.URL.Query().Get("t"))
+			session := r.Context().Value("session").(middleware.Session)
+			date, err := time.Parse("2006-01-02", r.PathValue("date"))
 
 			if err != nil {
-				tenantId = 1
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
 			}
 
-			page := page.NewPage(repos, tenantId, time.Now())
+			page := page.NewPage(repos, session, date)
 
-			// prescriptions, err := repos.PresciptionRepostiory.FindByTenant(tenantId)
-			// if err != nil {
-			// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-			// }
-
-			// var servings []*data.Serving
-
-			// for _, prescription := range prescriptions {
-			// 	servings = append(servings, prescription.NewServing(date))
-			// }
-
-			// page.Servings = servings
-
-			err = tmpl.ExecuteTemplate(w, "body.html", page)
-
-			if err != nil {
+			if err := tmpl.ExecuteTemplate(w, "body.html", page); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 		},
 	)

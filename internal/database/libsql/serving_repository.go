@@ -1,4 +1,4 @@
-package database
+package libsql
 
 import (
 	"database/sql"
@@ -7,17 +7,18 @@ import (
 	"time"
 
 	"github.com/jariinc/dosetti/internal/data"
+	"github.com/jariinc/dosetti/internal/database/database_interface"
 )
 
-type ServingRepository struct {
-	Database *Database
+type LibSQLServingRepository struct {
+	Database *Connection
 }
 
-func NewServingRepository(db *Database) *ServingRepository {
-	return &ServingRepository{Database: db}
+func NewLibSQLServingRepository(db *Connection) database_interface.ServingRepository {
+	return &LibSQLServingRepository{Database: db}
 }
 
-func (repo *ServingRepository) FindByOccurrence(tenantId int, prescriptionId int, occurrence int) (*data.Serving, error) {
+func (repo *LibSQLServingRepository) FindByOccurrence(tenantId int, prescriptionId int, occurrence int) (*data.Serving, error) {
 	var serving data.Serving
 	var taken_at_str sql.NullString
 
@@ -56,7 +57,7 @@ func (repo *ServingRepository) FindByOccurrence(tenantId int, prescriptionId int
 
 }
 
-func (repo *ServingRepository) FindByOccurrences(tenantId int, prescriptionId int, occurrence []int) ([]*data.Serving, error) {
+func (repo *LibSQLServingRepository) FindByOccurrences(tenantId int, prescriptionId int, occurrence []int) ([]*data.Serving, error) {
 	var servings []*data.Serving
 	var occurrences_str []string
 	var occurrences_sql string
@@ -112,7 +113,7 @@ func (repo *ServingRepository) FindByOccurrences(tenantId int, prescriptionId in
 	return servings, nil
 }
 
-func (repo *ServingRepository) Save(serving *data.Serving) error {
+func (repo *LibSQLServingRepository) Save(serving *data.Serving) error {
 	var taken_at sql.NullString
 
 	if !serving.TakenAt.IsZero() {
