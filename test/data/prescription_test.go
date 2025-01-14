@@ -9,6 +9,8 @@ import (
 )
 
 func TestHourlyOccurrancesBetweenDates(t *testing.T) {
+	t.Parallel()
+
 	p := data.Prescription{
 		Interval:     2,
 		IntervalUnit: data.IntervalHourly,
@@ -25,6 +27,8 @@ func TestHourlyOccurrancesBetweenDates(t *testing.T) {
 }
 
 func TestDailyOccurrancesBetweenDates(t *testing.T) {
+	t.Parallel()
+
 	p := data.Prescription{
 		Interval:     3,
 		IntervalUnit: data.IntervalDaily,
@@ -41,6 +45,8 @@ func TestDailyOccurrancesBetweenDates(t *testing.T) {
 }
 
 func TestWeeklyOccurrancesBetweenDates(t *testing.T) {
+	t.Parallel()
+
 	p := data.Prescription{
 		Interval:     1,
 		IntervalUnit: data.IntervalWeekly,
