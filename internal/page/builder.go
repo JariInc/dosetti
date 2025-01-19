@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/jariinc/dosetti/internal/database"
-	"github.com/jariinc/dosetti/internal/server/middleware"
+	"github.com/jariinc/dosetti/internal/server/session"
 )
 
-func NewPage(repos *database.Repositories, session middleware.Session, date time.Time) *Page {
+func NewPage(repos *database.Repositories, session session.Session, date time.Time) *Page {
 	page := &Page{
 		Today:       time.Now(),
 		CurrentDay:  date,

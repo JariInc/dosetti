@@ -11,7 +11,7 @@ import (
 
 	"github.com/jariinc/dosetti/internal/database"
 	"github.com/jariinc/dosetti/internal/page"
-	"github.com/jariinc/dosetti/internal/server/middleware"
+	"github.com/jariinc/dosetti/internal/server/session"
 	assets "github.com/jariinc/dosetti/web"
 )
 
@@ -20,10 +20,8 @@ var tmpl, _ = template.ParseGlob("web/html/*.html")
 func RedirectToDayView() http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-			session := ctx.Value("session").(middleware.Session)
-			current_day := time.Now()
-			url := fmt.Sprintf("/%s/%s/", session.Key, current_day.Format("2006-01-02"))
+			session := r.Context().Value("session").(session.Session)
+			url := fmt.Sprintf("/%s/%s/", session.Key, time.Now().Format("2006-01-02"))
 			http.Redirect(w, r, url, http.StatusSeeOther)
 		},
 	)
@@ -32,7 +30,7 @@ func RedirectToDayView() http.Handler {
 func RenderDayView() http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			session := r.Context().Value("session").(middleware.Session)
+			session := r.Context().Value("session").(session.Session)
 			date, err := time.Parse("2006-01-02", r.PathValue("date"))
 
 			if err != nil {
@@ -63,7 +61,7 @@ func RenderDayView() http.Handler {
 func RenderBody(repos *database.Repositories) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			session := r.Context().Value("session").(middleware.Session)
+			session := r.Context().Value("session").(session.Session)
 			date, err := time.Parse("2006-01-02", r.PathValue("date"))
 
 			if err != nil {

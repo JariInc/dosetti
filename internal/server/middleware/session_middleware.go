@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jariinc/dosetti/internal/database/database_interface"
+	"github.com/jariinc/dosetti/internal/server/session"
 )
 
 const TENANT_COOKIE = "tenant"
@@ -15,37 +16,36 @@ const TENANT_COOKIE = "tenant"
 func SessionMiddleware(tenant_repo database_interface.TenantRepository) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			var session Session
+			var ses session.Session
 			cookie, err := r.Cookie(TENANT_COOKIE)
 
 			if err != nil {
 				switch {
 				case errors.Is(err, http.ErrNoCookie):
-					session = NewSession()
-					tenant_repo.Save(session.Tenant)
+					ses = session.NewSession()
+					tenant_repo.Save(ses.Tenant)
 				default:
 					log.Println(err)
 					http.Error(w, "cookie error", http.StatusInternalServerError)
 					return
 				}
 			} else {
-				session = Session{Key: cookie.Value}
-
-				tenant, err := tenant_repo.FindByKey(session.Key)
+				ses = session.Session{Key: cookie.Value}
+				tenant, err := tenant_repo.FindByKey(ses.Key)
 				if err != nil {
-					session = NewSession()
-					tenant_repo.Save(session.Tenant)
+					ses = session.NewSession()
+					tenant_repo.Save(ses.Tenant)
 				} else {
-					session.Tenant = &tenant
+					ses.Tenant = &tenant
 				}
 			}
 
-			req := r.WithContext(context.WithValue(r.Context(), "session", session))
+			req := r.WithContext(context.WithValue(r.Context(), "session", ses))
 			*r = *req
 
 			newCookie := http.Cookie{
 				Name:     TENANT_COOKIE,
-				Value:    session.Key,
+				Value:    ses.Key,
 				Path:     "/",
 				Expires:  time.Now().Add(time.Hour * 24 * 365),
 				HttpOnly: true,

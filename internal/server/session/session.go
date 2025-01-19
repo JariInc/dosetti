@@ -1,4 +1,4 @@
-package middleware
+package session
 
 import (
 	"crypto/rand"
@@ -25,7 +25,7 @@ func NewSession() Session {
 
 func createNewKey() string {
 	var i big.Int
-	key_bytes := make([]byte, 16)
+	key_bytes := make([]byte, 8)
 
 	rand.Read(key_bytes)
 	i.SetBytes(key_bytes[:])
