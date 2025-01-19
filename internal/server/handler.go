@@ -82,19 +82,24 @@ func RenderBody(repos *database.Repositories) http.Handler {
 func RenderServing(repos *database.Repositories) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			tenantId, err := strconv.Atoi(r.URL.Query().Get("tenant"))
+			session := r.Context().Value("session").(session.Session)
+
+			fmt.Println("presciption:", r.PathValue("prescription"))
+
+			date, err := time.Parse("2006-01-02", r.PathValue("date"))
+
 			if err != nil {
-				http.Error(w, "Unable to parse tenant", http.StatusBadRequest)
+				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
 
-			prescriptionId, err := strconv.Atoi(r.URL.Query().Get("prescription"))
+			prescriptionId, err := strconv.Atoi(r.PathValue("prescription"))
 			if err != nil {
 				http.Error(w, "Unable to parse prescription", http.StatusBadRequest)
 				return
 			}
 
-			occurrence, err := strconv.Atoi(r.URL.Query().Get("occurrence"))
+			occurrence, err := strconv.Atoi(r.PathValue("occurrence"))
 			if err != nil {
 				http.Error(w, "Unable to parse occurrence", http.StatusBadRequest)
 				return
@@ -102,10 +107,10 @@ func RenderServing(repos *database.Repositories) http.Handler {
 
 			var taken bool
 
-			switch r.URL.Query().Get("taken") {
-			case "true":
+			switch r.PathValue("taken") {
+			case "taken":
 				taken = true
-			case "false":
+			case "not-taken":
 				taken = false
 			default:
 				http.Error(w, "Invalid taken value", http.StatusBadRequest)
@@ -117,7 +122,7 @@ func RenderServing(repos *database.Repositories) http.Handler {
 					http.Error(w, err.Error(), http.StatusNotFound)
 					return
 				} else {
-					prescription, err := repos.PresciptionRepostiory.FindById(tenantId, prescriptionId)
+					prescription, err := repos.PresciptionRepostiory.FindById(session.Tenant.Id, prescriptionId)
 					if err != nil {
 						http.Error(w, err.Error(), http.StatusNotFound)
 						return
@@ -129,7 +134,6 @@ func RenderServing(repos *database.Repositories) http.Handler {
 
 			serving.Taken = taken
 			serving.TakenAt = time.Now()
-
 			err = repos.ServingRepository.Save(serving)
 
 			if err != nil {
@@ -137,7 +141,8 @@ func RenderServing(repos *database.Repositories) http.Handler {
 				return
 			}
 
-			err = tmpl.ExecuteTemplate(w, "serving.html", serving)
+			page := page.NewPage(repos, session, date)
+			err = tmpl.ExecuteTemplate(w, "serving.html", page)
 
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)

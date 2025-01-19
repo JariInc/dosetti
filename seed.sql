@@ -5,9 +5,9 @@ DELETE FROM prescription;
 DELETE FROM serving;
 
 INSERT INTO
-    tenant (id, key, name)
+    tenant (id, key)
 VALUES
-    (1, 'foobar', 'FooBar');
+    (1, 'foobar');
 
 INSERT INTO
     prescription (

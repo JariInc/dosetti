@@ -34,6 +34,7 @@ func (p *Prescription) NewServing(occurrence int) *Serving {
 		TenantId:       p.TenantId,
 		PrescriptionId: p.Id,
 		Occurrence:     occurrence,
+		Medicine:       p.Medicine,
 		MedicineAmount: p.MedicineAmount,
 		Taken:          false,
 	}

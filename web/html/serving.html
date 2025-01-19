@@ -1,3 +1,7 @@
+{{ $SessionKey := .SessionKey }}
+{{ $CurrentDayUrl := .CurrentDay.Format "2006-01-02" }}
+
+{{ range .Servings }}
 <label class="label cursor-pointer" id="serving-{{.TenantId}}-{{.PrescriptionId}}-{{.Occurrence}}">
     <span class="label-text">{{.Medicine}} {{.MedicineAmount}}</span>
     <input
@@ -6,8 +10,9 @@
         {{if
         .Taken}}checked="checked"
         {{end}}
-        hx-post="/partials/serving?tenant={{.TenantId}}&prescription={{.PrescriptionId}}&occurrence={{.Occurrence}}&taken={{if .Taken}}false{{else}}true{{end}}"
+        hx-post="/{{$SessionKey}}/{{$CurrentDayUrl}}/servings/prescription/{{.PrescriptionId}}/occurrence/{{.Occurrence}}/{{if .Taken}}not-taken{{else}}taken{{end}}"
         hx-target="#serving-{{.TenantId}}-{{.PrescriptionId}}-{{.Occurrence}}"
         hx-swap="outerHTML"
     />
 </label>
+{{ end }}
