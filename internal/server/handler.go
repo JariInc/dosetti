@@ -27,7 +27,7 @@ func RedirectToDayView() http.Handler {
 	)
 }
 
-func RenderDayView() http.Handler {
+func RenderDayView(repos *database.Repositories) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			session := r.Context().Value("session").(session.Session)
@@ -37,43 +37,31 @@ func RenderDayView() http.Handler {
 				date = time.Now()
 			}
 
-			err = tmpl.ExecuteTemplate(w, "index.html", struct {
-				CSS        template.CSS
-				JavaScript template.JS
-				SessionKey string
-				CurrentDay time.Time
-			}{
-				CSS:        template.CSS(assets.CSS),
-				JavaScript: template.JS(assets.JavaScript),
-				SessionKey: session.Key,
-				CurrentDay: date,
-			})
+			if r.Header.Get("HX-Request") == "true" {
+				page := page.NewPage(repos, session, date)
 
-			if err != nil {
-				fmt.Println(err.Error())
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-		},
-	)
-}
+				if err := tmpl.ExecuteTemplate(w, "body.html", page); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			} else {
+				err = tmpl.ExecuteTemplate(w, "index.html", struct {
+					CSS        template.CSS
+					JavaScript template.JS
+					SessionKey string
+					CurrentDay time.Time
+				}{
+					CSS:        template.CSS(assets.CSS),
+					JavaScript: template.JS(assets.JavaScript),
+					SessionKey: session.Key,
+					CurrentDay: date,
+				})
 
-func RenderBody(repos *database.Repositories) http.Handler {
-	return http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			session := r.Context().Value("session").(session.Session)
-			date, err := time.Parse("2006-01-02", r.PathValue("date"))
-
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
-			}
-
-			page := page.NewPage(repos, session, date)
-
-			if err := tmpl.ExecuteTemplate(w, "body.html", page); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+				if err != nil {
+					fmt.Println(err.Error())
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
 			}
 		},
 	)

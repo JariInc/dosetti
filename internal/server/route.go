@@ -11,7 +11,6 @@ func AddRoutes(
 	repos *database.Repositories) {
 	mux.Handle("GET /{$}", RedirectToDayView())
 	mux.Handle("GET /{key}/{$}", RedirectToDayView())
-	mux.Handle("GET /{key}/{date}/{$}", RenderDayView())
-	mux.Handle("GET /{key}/{date}/servings/{$}", RenderBody(repos))
+	mux.Handle("GET /{key}/{date}/{$}", RenderDayView(repos))
 	mux.Handle("POST /{key}/{date}/servings/prescription/{prescription}/occurrence/{occurrence}/{taken}", RenderServing(repos))
 }

@@ -1,8 +1,9 @@
 <div class="btm-nav">
     <button
-        hx-get="/{{ .SessionKey }}/{{ .PreviousDay.Format "2006-01-02" }}/servings/"
+        hx-get="/{{ .SessionKey }}/{{ .PreviousDay.Format "2006-01-02" }}/"
         hx-target="body"
         hx-swap="innerHTML"
+        hx-push-url="true"
     >
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -23,9 +24,10 @@
         >
     </button>
     <button
-        hx-get="/{{ .SessionKey }}/{{ .Today.Format "2006-01-02" }}/servings/"
+        hx-get="/{{ .SessionKey }}/{{ .Today.Format "2006-01-02" }}/"
         hx-target="body"
         hx-swap="innerHTML"
+        hx-push-url="true"
     >
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -44,9 +46,10 @@
         <span class="btm-nav-label">Today</span>
     </button>
     <button
-        hx-get="/{{ .SessionKey }}/{{ .NextDay.Format "2006-01-02" }}/servings/"
+        hx-get="/{{ .SessionKey }}/{{ .NextDay.Format "2006-01-02" }}/"
         hx-target="body"
         hx-swap="innerHTML"
+        hx-push-url="true"
     >
         <svg
             xmlns="http://www.w3.org/2000/svg"
