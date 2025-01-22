@@ -9,7 +9,8 @@ import (
 func AddRoutes(
 	mux *http.ServeMux,
 	repos *database.Repositories) {
-	mux.Handle("GET /", RenderFrontpage())
-	mux.Handle("GET /partials/body", RenderBody(repos))
-	mux.Handle("POST /partials/serving", RenderServing(repos))
+	mux.Handle("GET /{$}", RedirectToDayView())
+	mux.Handle("GET /{key}/{$}", RedirectToDayView())
+	mux.Handle("GET /{key}/{date}/{$}", RenderDayView(repos))
+	mux.Handle("POST /{key}/{date}/servings/prescription/{prescription}/occurrence/{occurrence}/{taken}", RenderServing(repos))
 }

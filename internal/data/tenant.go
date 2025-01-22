@@ -1,7 +1,12 @@
 package data
 
 type Tenant struct {
-	Id   int
-	Key  string
-	Name string
+	Id  int
+	Key string
+}
+
+func NewTenant(key string) *Tenant {
+	return &Tenant{
+		Key: key,
+	}
 }

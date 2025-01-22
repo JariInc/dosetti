@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jariinc/dosetti/internal/database"
+	"github.com/jariinc/dosetti/internal/database/libsql"
 	"github.com/jariinc/dosetti/internal/server"
 	"github.com/joho/godotenv"
 )
@@ -26,7 +26,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 		fmt.Println(err.Error())
 	}
 
-	db, err := database.NewDatabase(os.Getenv("DATABASE_URL"))
+	db, err := libsql.NewConnection(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		return err
 	}
