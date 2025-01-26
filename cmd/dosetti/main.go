@@ -38,6 +38,13 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 
 	defer db.Close()
 
+	// Migrate the database before starting the server
+	slog.Info("migrating database...")
+	if err := database.Migrate(ctx, db); err != nil {
+		panic(err)
+	}
+	slog.Info("migration done")
+
 	server := server.NewServer(db)
 
 	httpServer := &http.Server{
