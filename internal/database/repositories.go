@@ -1,6 +1,8 @@
 package database
 
 import (
+	"database/sql"
+
 	"github.com/jariinc/dosetti/internal/database/database_interface"
 	"github.com/jariinc/dosetti/internal/database/libsql"
 )
@@ -11,7 +13,7 @@ type Repositories struct {
 	ServingRepository     database_interface.ServingRepository
 }
 
-func NewLibSQLRepositories(db *libsql.Connection) *Repositories {
+func NewLibSQLRepositories(db *sql.DB) *Repositories {
 	return &Repositories{
 		TenantRepository:      libsql.NewLibSQLTenantRepository(db),
 		PresciptionRepostiory: libsql.NewLibSQLPrescriptionRepository(db),

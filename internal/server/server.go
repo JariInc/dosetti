@@ -1,16 +1,16 @@
 package server
 
 import (
+	"database/sql"
 	"net/http"
 	"time"
 
 	"github.com/MadAppGang/httplog"
 	"github.com/jariinc/dosetti/internal/database"
-	"github.com/jariinc/dosetti/internal/database/libsql"
 	"github.com/jariinc/dosetti/internal/server/middleware"
 )
 
-func NewServer(db *libsql.Connection) http.Handler {
+func NewServer(db *sql.DB) http.Handler {
 	mux := http.NewServeMux()
 	repos := database.NewLibSQLRepositories(db)
 
