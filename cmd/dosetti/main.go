@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -12,18 +12,23 @@ import (
 	"sync"
 	"time"
 
+	"github.com/golang-cz/devslog"
+	"github.com/jariinc/dosetti/internal/database"
 	"github.com/jariinc/dosetti/internal/database/libsql"
 	"github.com/jariinc/dosetti/internal/server"
 	"github.com/joho/godotenv"
 )
 
 func run(ctx context.Context, w io.Writer, args []string) error {
+	logger := slog.New(devslog.NewHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println(err.Error())
+		slog.Error(".env loading failed", "error", err)
 	}
 
 	db, err := libsql.NewConnection(os.Getenv("DATABASE_URL"))
@@ -44,9 +49,9 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	}
 
 	go func() {
-		log.Printf("listening on %s\n", httpServer.Addr)
+		slog.Info("listening TPC portg", "addr", httpServer.Addr)
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Fprintf(os.Stderr, "error listening and serving: %s\n", err)
+			slog.Error("error listening and serving", "error", err)
 		}
 	}()
 
@@ -60,7 +65,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 		shutdownCtx, cancel := context.WithTimeout(shutdownCtx, 10*time.Second)
 		defer cancel()
 		if err := httpServer.Shutdown(shutdownCtx); err != nil {
-			fmt.Fprintf(os.Stderr, "error shutting down http server: %s\n", err)
+			slog.Error("error shutting down http server", "error", err)
 		}
 	}()
 
@@ -73,6 +78,7 @@ func main() {
 	ctx := context.Background()
 	if err := run(ctx, os.Stdout, os.Args); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
+		slog.Error("main exiting", "error", err)
 		os.Exit(1)
 	}
 }
