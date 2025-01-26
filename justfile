@@ -28,10 +28,10 @@ clean:
 alias migrate := migrate_up
 
 migrate_up:
-    goose -dir ./internal/database/migrations up
+    goose -dir ./migrations up
 
 migrate_down:
-    goose -dir ./internal/database/migrations down
+    goose -dir ./migrations down
 
 db_shell:
     sqlite3 dosetti.db
