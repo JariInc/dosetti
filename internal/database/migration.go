@@ -9,5 +9,9 @@ import (
 )
 
 func Migrate(ctx context.Context, connection *sql.DB) error {
+	if err := goose.SetDialect("turso"); err != nil {
+		return err
+	}
+
 	return goose.UpContext(ctx, connection, "./migrations")
 }
