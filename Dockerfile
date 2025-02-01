@@ -23,5 +23,6 @@ RUN go build -ldflags "-s -w -extldflags '-static'" -o ./build/dosetti cmd/doset
 FROM scratch
 COPY --from=build-go /build/build/dosetti /dosetti
 COPY --from=build-go /build/web/html /web/html
+COPY migrations /migrations
 
 ENTRYPOINT ["/dosetti"]
