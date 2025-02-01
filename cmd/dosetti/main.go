@@ -26,10 +26,7 @@ func run(ctx context.Context, w io.Writer, args []string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	err := godotenv.Load()
-	if err != nil {
-		slog.Error(".env loading failed", "error", err)
-	}
+	godotenv.Load()
 
 	db, err := libsql.NewConnection(os.Getenv("DATABASE_URL"))
 	if err != nil {
