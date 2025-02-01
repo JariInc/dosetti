@@ -1,0 +1,11 @@
+services:
+  dosetti:
+    image: ghcr.io/jariinc/dosetti:migration-on-startup
+    restart: unless-stopped
+    volumes:
+      - dosetti_data:/data
+    environment:
+      DATABASE_URL: file:./data/dosetti.db
+
+volumes:
+  dosetti_data:
