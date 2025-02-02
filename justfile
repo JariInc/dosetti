@@ -63,3 +63,9 @@ watch_js:
 
 watch_css:
     node_modules/.bin/tailwindcss -i ./web/css/tailwind.css -o web/assets/style.css --watch
+
+build_docker:
+    docker build -t dosetti:latest .
+
+run_docker:
+    docker run --rm -e DATABASE_URL="file:./dosetti.db" -p 8080:8080 dosetti:latest
