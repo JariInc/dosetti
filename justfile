@@ -28,10 +28,10 @@ clean:
 alias migrate := migrate_up
 
 migrate_up:
-    goose -dir ./internal/database/migrations up
+    goose -dir ./migrations up
 
 migrate_down:
-    goose -dir ./internal/database/migrations down
+    goose -dir ./migrations down
 
 db_shell:
     sqlite3 dosetti.db
@@ -63,3 +63,9 @@ watch_js:
 
 watch_css:
     node_modules/.bin/tailwindcss -i ./web/css/tailwind.css -o web/assets/style.css --watch
+
+build_docker:
+    docker build -t dosetti:latest .
+
+run_docker:
+    docker run --rm -e DATABASE_URL="file:./dosetti.db" -p 8080:8080 dosetti:latest

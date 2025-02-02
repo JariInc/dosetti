@@ -10,10 +10,10 @@ import (
 )
 
 type LibSQLPrescriptionRepository struct {
-	Database *Connection
+	Database *sql.DB
 }
 
-func NewLibSQLPrescriptionRepository(db *Connection) database_interface.PrescriptionRepository {
+func NewLibSQLPrescriptionRepository(db *sql.DB) database_interface.PrescriptionRepository {
 	return &LibSQLPrescriptionRepository{Database: db}
 }
 
@@ -23,7 +23,7 @@ func (repo *LibSQLPrescriptionRepository) FindById(tenantId int, id int) (*data.
 	var end_date_str sql.NullString
 	var err error
 
-	row := repo.Database.Conn.QueryRow("SELECT * FROM prescription WHERE tenant = ? AND id = ?", tenantId, id)
+	row := repo.Database.QueryRow("SELECT * FROM prescription WHERE tenant = ? AND id = ?", tenantId, id)
 	if err = row.Scan(
 		&prescription.Id,
 		&prescription.TenantId,
@@ -59,7 +59,7 @@ func (repo *LibSQLPrescriptionRepository) FindById(tenantId int, id int) (*data.
 func (repo *LibSQLPrescriptionRepository) FindBetweenDates(tenantId int, from time.Time, to time.Time) ([]data.Prescription, error) {
 	var err error
 	var prescriptions []data.Prescription
-	rows, err := repo.Database.Conn.Query(`
+	rows, err := repo.Database.Query(`
 		SELECT
 			id,
 		    tenant,

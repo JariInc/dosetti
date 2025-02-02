@@ -11,10 +11,10 @@ import (
 )
 
 type LibSQLServingRepository struct {
-	Database *Connection
+	Database *sql.DB
 }
 
-func NewLibSQLServingRepository(db *Connection) database_interface.ServingRepository {
+func NewLibSQLServingRepository(db *sql.DB) database_interface.ServingRepository {
 	return &LibSQLServingRepository{Database: db}
 }
 
@@ -22,7 +22,7 @@ func (repo *LibSQLServingRepository) FindByOccurrence(tenantId int, prescription
 	var serving data.Serving
 	var taken_at_str sql.NullString
 
-	row := repo.Database.Conn.QueryRow(`
+	row := repo.Database.QueryRow(`
 		SELECT s.id, s.tenant, s.prescription, s.occurrence, s.amount, s.taken, s.taken_at, p.medicine
 		FROM serving AS s
 		JOIN prescription AS p ON s.prescription = p.id
@@ -75,7 +75,7 @@ func (repo *LibSQLServingRepository) FindByOccurrences(tenantId int, prescriptio
 		JOIN prescription AS p ON s.prescription = p.id
 		WHERE s.tenant = ? AND s.prescription = ? AND s.occurrence IN (%s)`, occurrences_sql)
 
-	rows, err := repo.Database.Conn.Query(query, tenantId, prescriptionId)
+	rows, err := repo.Database.Query(query, tenantId, prescriptionId)
 
 	if err != nil {
 		return []*data.Serving{}, fmt.Errorf("ServingsByOccurences %d %d: %v", tenantId, prescriptionId, err)
@@ -123,7 +123,7 @@ func (repo *LibSQLServingRepository) Save(serving *data.Serving) error {
 		}
 	}
 
-	result, err := repo.Database.Conn.Exec(`
+	result, err := repo.Database.Exec(`
 		REPLACE INTO serving
 			(tenant, prescription, occurrence, amount, taken, taken_at)
 			VALUES (?, ?, ?, ?, ?, ?)`,

@@ -1,5 +1,4 @@
 -- +goose Up
--- +goose StatementBegin
 CREATE TABLE tenant (
     id INTEGER PRIMARY KEY,
     key TEXT NOT NULL,
@@ -36,13 +35,9 @@ CREATE TABLE serving (
 
 CREATE UNIQUE INDEX serving_occurrence ON serving (tenant, prescription, occurrence);
 
--- +goose StatementEnd
 -- +goose Down
--- +goose StatementBegin
 DROP TABLE serving;
 
 DROP TABLE prescription;
 
 DROP TABLE tenant;
-
--- +goose StatementEnd
