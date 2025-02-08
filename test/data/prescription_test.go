@@ -40,7 +40,7 @@ func TestDailyOccurrancesBetweenDates(t *testing.T) {
 
 	occurrances := p.OccurrancesBetweenDates(from, to)
 
-	assert.Len(t, occurrances, 10, "Expected 1o occurrances")
+	assert.Len(t, occurrances, 10, "Expected 10 occurrances")
 	assert.Equal(t, []int{51, 52, 53, 54, 55, 56, 57, 58, 59, 60}, occurrances)
 }
 
@@ -60,4 +60,22 @@ func TestWeeklyOccurrancesBetweenDates(t *testing.T) {
 
 	assert.Len(t, occurrances, 13, "Expected 13 occurrances")
 	assert.Equal(t, []int{22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34}, occurrances)
+}
+
+func TestMonthlyOccurrancesBetweenDates(t *testing.T) {
+	t.Parallel()
+
+	p := data.Prescription{
+		Interval:     1,
+		IntervalUnit: data.IntervalMonthly,
+		StartAt:      time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+	}
+
+	from := time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC)
+	to := time.Date(2025, 9, 30, 0, 0, 0, 0, time.UTC)
+
+	occurrances := p.OccurrancesBetweenDates(from, to)
+
+	assert.Len(t, occurrances, 4, "Expected 4 occurrances")
+	assert.Equal(t, []int{6, 7, 8, 9}, occurrances)
 }
