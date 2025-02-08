@@ -58,9 +58,20 @@ func (p *Prescription) OccurrancesBetweenDates(from time.Time, to time.Time) []i
 		occurrence_from = int(math.Ceil(hours_to_from / (float64(p.Interval) * 24 * 7)))
 		occurrence_to = int(math.Floor(hours_to_to / (float64(p.Interval) * 24 * 7)))
 	case IntervalMonthly:
-		//nextMonth := iter.AddDate(0, 1, 0)
-		//interval = nextMonth.Sub(iter)
-		// TODO
+		iter := p.StartAt
+		occurrence := 0
+		from_found := false
+		for iter.Before(to) {
+			if !from_found && from.Before(iter) {
+				occurrence_from = occurrence
+				from_found = true
+			}
+
+			iter = iter.AddDate(0, 1, 0)
+			occurrence += 1
+		}
+
+		occurrence_to = occurrence
 	default:
 		panic("unknown interval unit")
 	}
