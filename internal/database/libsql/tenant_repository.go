@@ -49,12 +49,12 @@ func (repo *LibSQLTenantRepository) Save(tenant *data.Tenant) error {
 	)
 
 	if err != nil {
-		return fmt.Errorf("Save serving: %v", err)
+		return fmt.Errorf("Save tenant: %v", err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return fmt.Errorf("Save serving: %v", err)
+		return fmt.Errorf("Save tenant: %v", err)
 	}
 	tenant.Id = int(id)
 
