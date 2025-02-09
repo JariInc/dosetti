@@ -1,16 +1,17 @@
-{{ $SessionKey := .SessionKey }}
-{{ $CurrentDayUrl := .CurrentDay.Format "2006-01-02" }}
-
-{{ range .Servings }}
-<label class="label cursor-pointer" id="serving-{{.TenantId}}-{{.PrescriptionId}}-{{.Occurrence}}">
-    <span class="label-text">{{.Medicine}} {{.MedicineAmount}}</span>
+{{ $SessionKey := .SessionKey }} {{ $CurrentDayUrl := .CurrentDay.Format
+"2006-01-02" }} {{ range .Servings }}
+<label
+    class="label cursor-pointer"
+    id="serving-{{.TenantId}}-{{.PrescriptionId}}-{{.Occurrence}}"
+>
+    <span class="label-text">{{.MedicineName}} {{.MedicineAmount}}</span>
     <input
         type="checkbox"
         class="toggle toggle-success"
         {{if
         .Taken}}checked="checked"
         {{end}}
-        hx-post="/{{$SessionKey}}/{{$CurrentDayUrl}}/servings/prescription/{{.PrescriptionId}}/occurrence/{{.Occurrence}}/{{if .Taken}}not-taken{{else}}taken{{end}}"
+        hx-post="/{{$SessionKey}}/{{$CurrentDayUrl}}/servings/prescription/{{.PrescriptionId}}/occurrence/{{.Occurrence}}/{{if .Taken}}not-taken{{else}}taken{{end}}?amount={{.MedicineAmount}}"
         hx-target="#serving-{{.TenantId}}-{{.PrescriptionId}}-{{.Occurrence}}"
         hx-swap="outerHTML"
     />
