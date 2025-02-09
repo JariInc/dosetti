@@ -77,8 +77,6 @@ func RenderServing(repos *database.Repositories) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) {
 			session := r.Context().Value("session").(session.Session)
 
-			fmt.Println("presciption:", r.PathValue("prescription"))
-
 			date, err := time.Parse("2006-01-02", r.PathValue("date"))
 
 			if err != nil {
@@ -98,7 +96,14 @@ func RenderServing(repos *database.Repositories) http.Handler {
 				return
 			}
 
+			amount, err := strconv.ParseFloat(r.URL.Query().Get("amount"), 64)
+			if err != nil {
+				http.Error(w, "Unable to parse amount", http.StatusBadRequest)
+				return
+			}
+
 			var taken bool
+			var doses_used float64 = 0.0
 
 			switch r.PathValue("taken") {
 			case "taken":
@@ -109,7 +114,7 @@ func RenderServing(repos *database.Repositories) http.Handler {
 				http.Error(w, "Invalid taken value", http.StatusBadRequest)
 			}
 
-			serving, err := repos.ServingRepository.FindByOccurrence(1, prescriptionId, occurrence)
+			serving, err := repos.ServingRepository.FindByOccurrence(session.Tenant.Id, prescriptionId, occurrence)
 			if err != nil {
 				if !errors.Is(err, sql.ErrNoRows) {
 					http.Error(w, err.Error(), http.StatusNotFound)
@@ -122,7 +127,19 @@ func RenderServing(repos *database.Repositories) http.Handler {
 					}
 
 					serving = prescription.NewServing(occurrence)
+
+					if taken {
+						doses_used = +amount
+					}
 				}
+			} else {
+				switch taken {
+				case true:
+					doses_used = +amount
+				case false:
+					doses_used = -amount
+				}
+
 			}
 
 			serving.Taken = taken
@@ -132,6 +149,24 @@ func RenderServing(repos *database.Repositories) http.Handler {
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
+			}
+
+			if doses_used != 0 {
+				medicine, err := repos.MedicineRepostory.FindById(session.Tenant.Id, serving.Medicine)
+
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+
+				medicine.DosesLeft -= doses_used
+
+				err = repos.MedicineRepostory.Save(medicine)
+
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
 			}
 
 			page := page.NewPage(repos, session, date)
