@@ -20,11 +20,6 @@ var tmpl, _ = template.ParseGlob("web/html/*.html")
 func RedirectToDayView() http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/" {
-				fmt.Println(r.URL.Path)
-				http.Error(w, "File not found", http.StatusNotFound)
-				return
-			}
 			session := r.Context().Value("session").(session.Session)
 			url := fmt.Sprintf("/%s/%s/", session.Key, time.Now().Format("2006-01-02"))
 			http.Redirect(w, r, url, http.StatusSeeOther)
@@ -76,8 +71,6 @@ func RenderServing(repos *database.Repositories) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			session := r.Context().Value("session").(session.Session)
-
-			fmt.Println("presciption:", r.PathValue("prescription"))
 
 			date, err := time.Parse("2006-01-02", r.PathValue("date"))
 
