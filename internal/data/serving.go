@@ -7,8 +7,10 @@ type Serving struct {
 	TenantId       int
 	PrescriptionId int
 	Occurrence     int
-	Medicine       string
-	MedicineAmount string
+	Medicine       int
+	MedicineName   string
+	MedicineAmount float64
 	Taken          bool
 	TakenAt        time.Time
+	DosesLeft      float64
 }

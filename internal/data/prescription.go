@@ -25,8 +25,10 @@ type Prescription struct {
 	IntervalUnit   IntervalUnit
 	StartAt        time.Time
 	EndAt          time.Time
-	Medicine       string
-	MedicineAmount string
+	Medicine       int
+	MedicineName   string
+	MedicineAmount float64
+	DosesLeft      float64
 }
 
 func (p *Prescription) NewServing(occurrence int) *Serving {
@@ -35,8 +37,10 @@ func (p *Prescription) NewServing(occurrence int) *Serving {
 		PrescriptionId: p.Id,
 		Occurrence:     occurrence,
 		Medicine:       p.Medicine,
+		MedicineName:   p.MedicineName,
 		MedicineAmount: p.MedicineAmount,
 		Taken:          false,
+		DosesLeft:      p.DosesLeft,
 	}
 }
 

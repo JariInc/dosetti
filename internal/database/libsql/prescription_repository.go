@@ -23,7 +23,21 @@ func (repo *LibSQLPrescriptionRepository) FindById(tenantId int, id int) (*data.
 	var end_date_str sql.NullString
 	var err error
 
-	row := repo.Database.QueryRow("SELECT * FROM prescription WHERE tenant = ? AND id = ?", tenantId, id)
+	row := repo.Database.QueryRow(`
+		SELECT
+			p.id,
+			p.tenant,
+		 	p.interval,
+			p.interval_unit,
+			p.start_at,
+			p.end_at,
+			p.medicine,
+			p.amount,
+			m.name,
+			m.doses_left
+		FROM prescription AS p
+		JOIN medicine AS m ON p.medicine = m.id
+		WHERE p.tenant = ? AND p.id = ?`, tenantId, id)
 	if err = row.Scan(
 		&prescription.Id,
 		&prescription.TenantId,
@@ -33,6 +47,8 @@ func (repo *LibSQLPrescriptionRepository) FindById(tenantId int, id int) (*data.
 		&end_date_str,
 		&prescription.Medicine,
 		&prescription.MedicineAmount,
+		&prescription.MedicineName,
+		&prescription.DosesLeft,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return &data.Prescription{}, fmt.Errorf("PrescriptionById %d: %v", id, err)
@@ -61,22 +77,25 @@ func (repo *LibSQLPrescriptionRepository) FindBetweenDates(tenantId int, from ti
 	var prescriptions []data.Prescription
 	rows, err := repo.Database.Query(`
 		SELECT
-			id,
-		    tenant,
-			interval,
-			interval_unit,
-			start_at,
-			end_at,
-			medicine,
-			amount
-		FROM prescription
+			p.id,
+			p.tenant,
+			p.interval,
+			p.interval_unit,
+			p.start_at,
+			p.end_at,
+			p.medicine,
+			p.amount,
+			m.name,
+			m.doses_left
+		FROM prescription AS p
+		JOIN medicine AS m ON p.medicine = m.id
 		WHERE
-			tenant = ?
+			p.tenant = ?
 			AND (
-				(start_at BETWEEN ? AND ?)
-				OR (end_at BETWEEN ? AND ?)
-			 	OR (start_at <= ? AND end_at > ?)
-				OR (start_at <= ? AND end_at IS NULL)
+				(p.start_at BETWEEN ? AND ?)
+				OR (p.end_at BETWEEN ? AND ?)
+			 	OR (p.start_at <= ? AND p.end_at > ?)
+				OR (p.start_at <= ? AND p.end_at IS NULL)
 			)`, tenantId, from, to, from, to, from, to, to)
 
 	if err != nil {
@@ -98,6 +117,8 @@ func (repo *LibSQLPrescriptionRepository) FindBetweenDates(tenantId int, from ti
 			&end_date_str,
 			&prescription.Medicine,
 			&prescription.MedicineAmount,
+			&prescription.MedicineName,
+			&prescription.DosesLeft,
 		); err != nil {
 			return []data.Prescription{}, fmt.Errorf("PrescriptionBetweenDates %d %s %s: %v", tenantId, from, to, err)
 		}
