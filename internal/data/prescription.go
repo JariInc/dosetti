@@ -28,6 +28,7 @@ type Prescription struct {
 	Medicine       int
 	MedicineName   string
 	MedicineAmount float64
+	DosesLeft      float64
 }
 
 func (p *Prescription) NewServing(occurrence int) *Serving {
@@ -39,6 +40,7 @@ func (p *Prescription) NewServing(occurrence int) *Serving {
 		MedicineName:   p.MedicineName,
 		MedicineAmount: p.MedicineAmount,
 		Taken:          false,
+		DosesLeft:      p.DosesLeft,
 	}
 }
 

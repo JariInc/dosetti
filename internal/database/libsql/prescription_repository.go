@@ -24,7 +24,17 @@ func (repo *LibSQLPrescriptionRepository) FindById(tenantId int, id int) (*data.
 	var err error
 
 	row := repo.Database.QueryRow(`
-		SELECT p.id, p.tenant, p.interval, p.interval_unit, p.start_at, p.end_at, p.medicine, p.amount, m.name
+		SELECT
+			p.id,
+			p.tenant,
+		 	p.interval,
+			p.interval_unit,
+			p.start_at,
+			p.end_at,
+			p.medicine,
+			p.amount,
+			m.name,
+			m.doses_left
 		FROM prescription AS p
 		JOIN medicine AS m ON p.medicine = m.id
 		WHERE p.tenant = ? AND p.id = ?`, tenantId, id)
@@ -38,6 +48,7 @@ func (repo *LibSQLPrescriptionRepository) FindById(tenantId int, id int) (*data.
 		&prescription.Medicine,
 		&prescription.MedicineAmount,
 		&prescription.MedicineName,
+		&prescription.DosesLeft,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return &data.Prescription{}, fmt.Errorf("PrescriptionById %d: %v", id, err)
@@ -74,7 +85,8 @@ func (repo *LibSQLPrescriptionRepository) FindBetweenDates(tenantId int, from ti
 			p.end_at,
 			p.medicine,
 			p.amount,
-			m.name
+			m.name,
+			m.doses_left
 		FROM prescription AS p
 		JOIN medicine AS m ON p.medicine = m.id
 		WHERE
@@ -106,6 +118,7 @@ func (repo *LibSQLPrescriptionRepository) FindBetweenDates(tenantId int, from ti
 			&prescription.Medicine,
 			&prescription.MedicineAmount,
 			&prescription.MedicineName,
+			&prescription.DosesLeft,
 		); err != nil {
 			return []data.Prescription{}, fmt.Errorf("PrescriptionBetweenDates %d %s %s: %v", tenantId, from, to, err)
 		}

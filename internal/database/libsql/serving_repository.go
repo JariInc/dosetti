@@ -23,7 +23,7 @@ func (repo *LibSQLServingRepository) FindByOccurrence(tenantId int, prescription
 	var taken_at_str sql.NullString
 
 	row := repo.Database.QueryRow(`
-		SELECT s.id, s.tenant, s.prescription, s.occurrence, s.amount, s.taken, s.taken_at, p.medicine, m.name
+		SELECT s.id, s.tenant, s.prescription, s.occurrence, s.amount, s.taken, s.taken_at, p.medicine, m.name, m.doses_left
 		FROM serving AS s
 		JOIN prescription AS p ON s.prescription = p.id
 		JOIN medicine AS m ON p.medicine = m.id
@@ -40,6 +40,7 @@ func (repo *LibSQLServingRepository) FindByOccurrence(tenantId int, prescription
 		&taken_at_str,
 		&serving.Medicine,
 		&serving.MedicineName,
+		&serving.DosesLeft,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return &data.Serving{}, fmt.Errorf("ServingByOccurrence %d %d %d: %w", tenantId, prescriptionId, occurrence, err)
@@ -72,7 +73,7 @@ func (repo *LibSQLServingRepository) FindByOccurrences(tenantId int, prescriptio
 	occurrences_sql = strings.Join(occurrences_str, ", ")
 
 	query := fmt.Sprintf(`
-		SELECT s.id, s.tenant, s.prescription, s.occurrence, s.taken, s.taken_at, p.medicine, s.amount, m.name
+		SELECT s.id, s.tenant, s.prescription, s.occurrence, s.taken, s.taken_at, p.medicine, s.amount, m.name, m.doses_left
 		FROM serving AS s
 		JOIN prescription AS p ON s.prescription = p.id
 		JOIN medicine AS m ON p.medicine = m.id
@@ -100,6 +101,7 @@ func (repo *LibSQLServingRepository) FindByOccurrences(tenantId int, prescriptio
 			&serving.Medicine,
 			&serving.MedicineAmount,
 			&serving.MedicineName,
+			&serving.DosesLeft,
 		); err != nil {
 			return []*data.Serving{}, err
 		}

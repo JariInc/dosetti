@@ -18,7 +18,13 @@ func NewLibSQLMedicineRepository(db *sql.DB) database_interface.MedicineReposito
 
 func (repo *LibSQLMedicineRepository) FindById(tenantId int, id int) (*data.Medicine, error) {
 	var medicine data.Medicine
-	row := repo.Database.QueryRow("SELECT id, tenant, name, doses_left FROM medicine WHERE id = ? AND tenant = ?", id, tenantId)
+	row := repo.Database.QueryRow(`
+		SELECT id, tenant, name, doses_left
+		FROM medicine
+		WHERE id = ? AND tenant = ?`,
+		id,
+		tenantId,
+	)
 	if err := row.Scan(&medicine.Id, &medicine.TenantId, &medicine.Name, &medicine.DosesLeft); err != nil {
 		if err == sql.ErrNoRows {
 			return &medicine, fmt.Errorf("MedicinetById %d: no such medicine", id)

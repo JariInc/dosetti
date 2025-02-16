@@ -12,4 +12,5 @@ type Serving struct {
 	MedicineAmount float64
 	Taken          bool
 	TakenAt        time.Time
+	DosesLeft      float64
 }

@@ -4,7 +4,10 @@
     class="label cursor-pointer"
     id="serving-{{.TenantId}}-{{.PrescriptionId}}-{{.Occurrence}}"
 >
-    <span class="label-text">{{.MedicineName}} {{.MedicineAmount}}</span>
+    <span class="label-text">
+        {{.MedicineName}} {{.MedicineAmount}}<br />
+        <span class="text-xs text-gray-700">{{.DosesLeft}} left</span>
+    </span>
     <input
         type="checkbox"
         class="toggle toggle-success"
