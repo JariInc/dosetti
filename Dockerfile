@@ -8,7 +8,7 @@ COPY web web
 RUN npx esbuild ./web/js/*.js --bundle --outfile=web/assets/bundle.js --minify
 RUN npx tailwindcss -i ./web/css/tailwind.css -o web/assets/style.css --minify
 
-FROM golang:1.23 AS build-go
+FROM golang:1.24 AS build-go
 WORKDIR /build
 
 COPY cmd ./cmd
