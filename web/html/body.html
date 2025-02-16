@@ -1,15 +1,13 @@
 {{template "top-nav.html" .}} {{template "bottom-nav.html" .}}
 
-<div class="container mx-auto px-4" id="servings">
-  <div class="flex flex-col gap-y-4">
-      <div class="card bg-base-100 shadow-xl">
-          <div class="card-body">
-              <h2 class="card-title">servings:</h2>
-
-              <div class="form-control">
-                  {{ template "serving.html" . }}
-              </div>
-          </div>
-      </div>
-  </div>
+<div class="container mx-auto px-4">
+    <div class="flex flex-col gap-y-4">
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <div class="form-control" id="servings">
+                    {{ template "serving.html" . }}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
