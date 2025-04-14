@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/MadAppGang/httplog v1.3.0
-	github.com/golang-cz/devslog v0.0.11
+	github.com/golang-cz/devslog v0.0.12
 	github.com/joho/godotenv v1.5.1
 	github.com/pressly/goose/v3 v3.24.1
 	github.com/stretchr/testify v1.10.0
